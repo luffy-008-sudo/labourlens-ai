@@ -22,7 +22,18 @@ import { TN_38_DISTRICTS } from "@/lib/districtsData";
 import { QUALIFICATION_PATHWAYS } from "@/lib/coreDomainRoadmaps";
 
 export default function UserProfilePage() {
-  const { profile, login, logout, updateProfile, parseResume } = useUserProfile();
+  const {
+    profile,
+    login,
+    logout,
+    updateProfile,
+    parseResume,
+    loadResumePreset,
+    setSelectedDistrict,
+    setSelectedQualification,
+    setCareerTrack: setGlobalCareerTrack,
+    setRawResumeText,
+  } = useUserProfile();
 
   // Local form state
   const [name, setName] = useState(profile?.name || "Guest Learner");
@@ -66,6 +77,50 @@ export default function UserProfilePage() {
     setResumeText(text);
     const parsed = parseResume(text);
     setSkills(parsed);
+    setRawResumeText(text);
+  };
+
+  const handleDistrictChange = (newDistrict: string) => {
+    setDistrict(newDistrict);
+    setSelectedDistrict(newDistrict);
+  };
+
+  const handleQualificationChange = (newQual: string) => {
+    setQualification(newQual);
+    setSelectedQualification(newQual);
+  };
+
+  const handleCareerTrackChange = (newTrack: "both" | "govt" | "private") => {
+    setCareerTrack(newTrack);
+    setGlobalCareerTrack(newTrack);
+  };
+
+  const handlePresetClick = (presetKey: "iti_fitter" | "diploma_mech" | "btech_auto") => {
+    loadResumePreset(presetKey);
+    if (presetKey === "iti_fitter") {
+      const txt =
+        "Government ITI Fitter trade certified. Hands-on experience with conventional lathe turning, bench fitting, reading engineering drawings, vernier calipers, micrometer metrology, TIG welding basics, and DISH shopfloor safety compliance.";
+      setResumeText(txt);
+      setSkills(parseResume(txt));
+      setQualification("iti_polytechnic");
+      setBranch("Mechanical & CNC Tooling");
+    } else if (presetKey === "diploma_mech") {
+      const txt =
+        "Diploma in Mechanical Engineering from Government Polytechnic. Experienced in CNC lathe & milling machine operation, AutoCAD 2D drafting, preventive maintenance schedules, hydraulic pump repair, P&ID reading, and ISO 9001 quality audits.";
+      setResumeText(txt);
+      setSkills(parseResume(txt));
+      setQualification("iti_polytechnic");
+      setBranch("Mechanical & CNC Tooling");
+    } else if (presetKey === "btech_auto") {
+      const txt =
+        "B.E. Mechanical & Mechatronics Graduate. Completed academic projects on EV battery thermal management, PLC programming (Siemens S7-1200), SCADA telemetry, SolidWorks CAD modeling, HAZOP analysis, and industrial robotics.";
+      setResumeText(txt);
+      setSkills(parseResume(txt));
+      setQualification("btech_graduate");
+      setBranch("Electric Vehicles & Battery Tech");
+    }
+    setSavedSuccess(true);
+    setTimeout(() => setSavedSuccess(false), 2500);
   };
 
   const handleSaveProfile = (e: React.FormEvent) => {
@@ -81,6 +136,10 @@ export default function UserProfilePage() {
       resumeSummary: resumeText,
       extractedSkills: skills,
     });
+    setSelectedDistrict(district);
+    setSelectedQualification(qualification);
+    setGlobalCareerTrack(careerTrack);
+    setRawResumeText(resumeText);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
   };
@@ -204,7 +263,7 @@ export default function UserProfilePage() {
                 </label>
                 <select
                   value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
+                  onChange={(e) => handleDistrictChange(e.target.value)}
                   className="w-full p-3.5 text-base font-bold bg-[#FAF9F5] border-2 border-black rounded-xl focus:outline-none focus:bg-white shadow-[2px_2px_0px_0px_#000000]"
                 >
                   {Object.values(TN_38_DISTRICTS).map((d) => (
@@ -226,7 +285,7 @@ export default function UserProfilePage() {
                 </label>
                 <select
                   value={qualification}
-                  onChange={(e) => setQualification(e.target.value)}
+                  onChange={(e) => handleQualificationChange(e.target.value)}
                   className="w-full p-3.5 text-base font-bold bg-[#FAF9F5] border-2 border-black rounded-xl focus:outline-none focus:bg-white shadow-[2px_2px_0px_0px_#000000]"
                 >
                   {Object.values(QUALIFICATION_PATHWAYS).map((q) => (
@@ -311,7 +370,7 @@ export default function UserProfilePage() {
                         name="careerTrack"
                         value={opt.id}
                         checked={careerTrack === opt.id}
-                        onChange={() => setCareerTrack(opt.id as "both" | "govt" | "private")}
+                        onChange={() => handleCareerTrackChange(opt.id as "both" | "govt" | "private")}
                         className="text-black focus:ring-black h-5 w-5"
                       />
                     </div>
@@ -323,8 +382,8 @@ export default function UserProfilePage() {
           </div>
 
           {/* Section 4: Resume / Skill Parser */}
-          <div className="bg-white border-2 border-black rounded-[28px] p-6 sm:p-10 shadow-[5px_5px_0px_0px_#000000] space-y-5">
-            <div className="pb-4 border-b-2 border-black flex items-center justify-between">
+          <div className="bg-white border-2 border-black rounded-[28px] p-6 sm:p-10 shadow-[5px_5px_0px_0px_#000000] space-y-6">
+            <div className="pb-4 border-b-2 border-black flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-black text-[#F5C518] font-extrabold font-mono text-sm flex items-center justify-center border border-black">
                   4
@@ -333,10 +392,43 @@ export default function UserProfilePage() {
                   Resume / Skill Parser Box
                 </h2>
               </div>
-              <span className="text-sm font-mono text-black font-extrabold flex items-center gap-2 px-3.5 py-1.5 bg-[#F5C518] border-2 border-black rounded-full shadow-[2px_2px_0px_0px_#000000]">
+              <span className="text-sm font-mono text-black font-extrabold flex items-center gap-2 px-3.5 py-1.5 bg-[#F5C518] border-2 border-black rounded-full shadow-[2px_2px_0px_0px_#000000] w-fit">
                 <Sparkles className="w-4 h-4 text-black" />
                 Live Skill Extractor
               </span>
+            </div>
+
+            {/* Quick-Load Demo Presets (Neo-Brutalist Sticker Pills) */}
+            <div className="p-4 bg-[#FAF9F5] border-2 border-black rounded-2xl space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-extrabold text-black uppercase tracking-wider">
+                  ⚡ ONE-CLICK DEMO RESUME PRESETS:
+                </span>
+                <span className="text-[11px] font-mono text-zinc-600 font-bold">Auto-fills skills &amp; score</span>
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => handlePresetClick("iti_fitter")}
+                  className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-1.5"
+                >
+                  <span>⚡ ITI Fitter (Machine Tools &amp; Lathe)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePresetClick("diploma_mech")}
+                  className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-1.5"
+                >
+                  <span>⚡ Diploma Mech (CNC, CAD &amp; QA)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePresetClick("btech_auto")}
+                  className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-1.5"
+                >
+                  <span>⚡ B.E. Mechatronics / EV (PLC &amp; BMS)</span>
+                </button>
+              </div>
             </div>
 
             <div>

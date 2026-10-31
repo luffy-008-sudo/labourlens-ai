@@ -809,46 +809,121 @@ function LearnerRoutesContent() {
             <RoadmapStepper phases={stepperPhases} />
           </div>
 
-          {/* SECTION 3: Employers */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 sm:p-8 bg-white border-2 border-black rounded-[24px] shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between space-y-6">
-              <div>
-                <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-black font-mono">
-                  <span className="font-extrabold text-base uppercase text-black">GOVERNMENT & PSU UNITS</span>
-                  <span className="text-xs bg-[#F5C518] text-black font-extrabold px-2.5 py-0.5 rounded-full border border-black">PERMANENT</span>
+          {/* SECTION 3: Employers & NAPS Apprenticeship Portals */}
+          <div className="space-y-6">
+            <div className="p-5 bg-[#FAF9F5] border-2 border-black rounded-[24px] shadow-[4px_4px_0px_0px_#000000] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F5C518] border border-black rounded-full text-xs font-mono font-extrabold uppercase text-black">
+                  <Sparkles className="w-3.5 h-3.5 text-black" />
+                  <span>DIRECT APPRENTICESHIP &amp; HIRING GATES</span>
                 </div>
-                <ul className="space-y-2.5 font-mono text-sm">
-                  {roadmap.localHiring.govtPsuEmployers.map((emp, idx) => (
-                    <li key={idx} className="p-3 bg-[#FAF9F5] border-2 border-black rounded-xl flex items-start gap-2.5">
-                      <span className="text-black font-extrabold">■</span>
-                      <span className="font-extrabold text-black">{emp}</span>
-                    </li>
-                  ))}
-                </ul>
+                <h4 className="text-lg sm:text-xl font-extrabold uppercase font-sans text-black">
+                  Verified Local Recruitment Portals ({selectedDistrict})
+                </h4>
+                <p className="text-xs font-mono text-zinc-700 font-bold">
+                  Bypass unverified job brokers. Apply directly through official central &amp; state portals:
+                </p>
               </div>
-              <p className="text-xs font-mono text-zinc-600 pt-3 border-t-2 border-zinc-100 font-bold">
-                Recruitment via TRB, TNPSC, NLC/BHEL notifications.
-              </p>
+
+              <div className="flex flex-wrap gap-2.5 shrink-0">
+                <a
+                  href="https://www.apprenticeshipindia.gov.in/apprenticeship/opportunity"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-1.5"
+                >
+                  <span>NAPS Portal ↗</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+                <a
+                  href="https://www.ncs.gov.in/job-seeker/pages/search.aspx"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-1.5"
+                >
+                  <span>NCS Portal ↗</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+                <a
+                  href="https://www.tnskill.tn.gov.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-1.5"
+                >
+                  <span>TNSDC Skills ↗</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
 
-            <div className="p-6 sm:p-8 bg-white border-2 border-black rounded-[24px] shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between space-y-6">
-              <div>
-                <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-black font-mono">
-                  <span className="font-extrabold text-base uppercase text-black">PRIVATE ANCHOR PLANTS</span>
-                  <span className="text-xs bg-emerald-100 text-emerald-900 font-extrabold px-2.5 py-0.5 rounded-full border border-black">RAPID HIRING</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Government & PSU Track */}
+              <div className="p-6 sm:p-8 bg-white border-2 border-black rounded-[24px] shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between space-y-6">
+                <div>
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-black font-mono">
+                    <span className="font-extrabold text-base uppercase text-black">GOVERNMENT &amp; PSU UNITS</span>
+                    <span className="text-xs bg-[#F5C518] text-black font-extrabold px-2.5 py-0.5 rounded-full border border-black">PERMANENT</span>
+                  </div>
+                  <ul className="space-y-3 font-mono text-sm">
+                    {roadmap.localHiring.govtPsuEmployers.map((emp, idx) => (
+                      <li key={idx} className="p-3 bg-[#FAF9F5] border-2 border-black rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-[1px_1px_0px_0px_#000000]">
+                        <div className="flex items-center gap-2">
+                          <span className="text-black font-extrabold">■</span>
+                          <span className="font-extrabold text-black">{emp}</span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <a
+                            href={`https://www.google.com/search?q=${encodeURIComponent(emp + " " + selectedDistrict + " recruitment notification")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-white hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1"
+                          >
+                            <span>Notification</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-2.5 font-mono text-sm">
-                  {roadmap.localHiring.privateSipcotEmployers.map((emp, idx) => (
-                    <li key={idx} className="p-3 bg-[#FAF9F5] border-2 border-black rounded-xl flex items-start gap-2.5">
-                      <span className="text-black font-extrabold">■</span>
-                      <span className="font-extrabold text-black">{emp}</span>
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-xs font-mono text-zinc-600 pt-3 border-t-2 border-zinc-100 font-bold">
+                  Recruitment via TRB, TNPSC, NLC/BHEL trade apprentice notifications.
+                </p>
               </div>
-              <p className="text-xs font-mono text-zinc-600 pt-3 border-t-2 border-zinc-100 font-bold">
-                Direct walk-in technical interviews & NAPS contracts.
-              </p>
+
+              {/* Private Anchor Plants */}
+              <div className="p-6 sm:p-8 bg-white border-2 border-black rounded-[24px] shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between space-y-6">
+                <div>
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-black font-mono">
+                    <span className="font-extrabold text-base uppercase text-black">PRIVATE ANCHOR PLANTS</span>
+                    <span className="text-xs bg-emerald-100 text-emerald-900 font-extrabold px-2.5 py-0.5 rounded-full border border-black">RAPID HIRING</span>
+                  </div>
+                  <ul className="space-y-3 font-mono text-sm">
+                    {roadmap.localHiring.privateSipcotEmployers.map((emp, idx) => (
+                      <li key={idx} className="p-3 bg-[#FAF9F5] border-2 border-black rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-[1px_1px_0px_0px_#000000]">
+                        <div className="flex items-center gap-2">
+                          <span className="text-black font-extrabold">■</span>
+                          <span className="font-extrabold text-black">{emp}</span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <a
+                            href={`https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(emp + " " + selectedDistrict)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-white hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1"
+                          >
+                            <span>Jobs</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="text-xs font-mono text-zinc-600 pt-3 border-t-2 border-zinc-100 font-bold">
+                  Direct walk-in technical interviews &amp; NAPS apprentice contracts.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -885,13 +960,69 @@ function LearnerRoutesContent() {
             </div>
           </div>
 
-          {/* Maps */}
-          <div className="border-2 border-black rounded-[28px] overflow-hidden p-6 sm:p-8 bg-white shadow-[5px_5px_0px_0px_#000000]">
+          {/* Maps & District Vocational Centers */}
+          <div className="border-2 border-black rounded-[28px] overflow-hidden p-6 sm:p-8 bg-white shadow-[5px_5px_0px_0px_#000000] space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-black gap-3">
+              <div>
+                <span className="text-xs font-mono font-extrabold text-black uppercase tracking-widest block mb-1">
+                  SPATIAL VOCATIONAL RADAR
+                </span>
+                <h4 className="text-xl sm:text-2xl font-extrabold uppercase font-sans text-black">
+                  {selectedDistrict} Industrial Parks &amp; Govt ITI Network
+                </h4>
+              </div>
+              <span className="text-xs font-mono font-extrabold bg-[#F5C518] border border-black px-3 py-1 rounded-full shadow-[2px_2px_0px_0px_#000000] w-fit">
+                38 DISTRICTS CONNECTED
+              </span>
+            </div>
+
             <GoogleMapsEmbed
               districtName={districtObj.name}
               lat={districtObj.lat}
               lon={districtObj.lon}
             />
+
+            {/* List of Local ITIs & Polytechnics with One-Click Directions */}
+            {roadmap.districtRegistry.nearbyItisAndTraining && roadmap.districtRegistry.nearbyItisAndTraining.length > 0 && (
+              <div className="pt-4 border-t-2 border-black space-y-3">
+                <span className="text-xs font-mono font-extrabold text-black uppercase tracking-wider block">
+                  LOCAL ACCREDITED TRAINING HUBS IN {selectedDistrict.toUpperCase()}:
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {roadmap.districtRegistry.nearbyItisAndTraining.map((iti, iIdx) => (
+                    <div
+                      key={iIdx}
+                      className="p-4 bg-[#FAF9F5] border-2 border-black rounded-xl flex flex-col justify-between shadow-[2px_2px_0px_0px_#000000] space-y-2"
+                    >
+                      <div>
+                        <div className="font-extrabold text-sm text-black font-sans">{iti.name}</div>
+                        <div className="text-xs font-mono text-zinc-600 font-bold">{iti.location}</div>
+                        {iti.relevantTrades && iti.relevantTrades.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {iti.relevantTrades.slice(0, 3).map((tr, tIdx) => (
+                              <span
+                                key={tIdx}
+                                className="text-[10px] font-mono px-2 py-0.5 bg-white border border-black rounded-full font-bold"
+                              >
+                                {tr}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(iti.name + " " + selectedDistrict + " Tamil Nadu")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-mono font-extrabold text-black hover:underline inline-flex items-center gap-1 pt-1"
+                      >
+                        <span>📍 Locate on Maps ↗</span>
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
