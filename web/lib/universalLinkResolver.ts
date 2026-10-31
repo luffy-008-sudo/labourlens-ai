@@ -1,8 +1,8 @@
 /**
  * Universal Dynamic Deep-Link Resolver Engine for Labourlens AI
  * Guarantees zero dead/generic root homepage redirects across all 38 Tamil Nadu districts.
- * Supports multi-platform verification: Google Jobs (Aggregated across LinkedIn, Indeed & Naukri),
- * LinkedIn Jobs, Indeed India, and Official Career Pages.
+ * Supports multi-portal verification: Google Jobs (Aggregated across LinkedIn, Naukri, Indeed),
+ * LinkedIn Jobs (Sanitized 1-2 word brand + simplified role), Indeed India, and Naukri.
  */
 
 export type LinkCategory =
@@ -21,6 +21,7 @@ export type JobPortalTarget =
   | 'google_jobs'
   | 'linkedin'
   | 'indeed'
+  | 'naukri'
   | 'career'
   | 'notification';
 
@@ -61,31 +62,33 @@ const DISTRICT_ALIASES: Record<string, string> = {
   Ranipet: 'Ranipet Walajapet',
 };
 
-/**
- * Strips parentheses, acronym explanations, and corporate suffixes that break
- * LinkedIn and Indeed query parsers (e.g. "SPIC (Southern Petrochemical...)" -> "SPIC")
- */
-export function extractCleanBrandName(raw: string): string {
-  if (!raw) return '';
-  // Check if there is an uppercase acronym inside parentheses e.g. "Southern Petrochemical (SPIC)"
-  const parenMatch = raw.match(/\(([^)]+)\)/);
-  if (parenMatch && parenMatch[1]) {
-    const inside = parenMatch[1].trim();
-    if (inside.length <= 8 && inside === inside.toUpperCase()) {
-      return inside;
-    }
-  }
-
-  // Extract text before parentheses or slashes
-  let brand = raw.split('(')[0].split('/')[0].trim();
-
-  // Strip corporate clutter words that impede job matching
-  brand = brand
-    .replace(/\b(Private|Pvt|Limited|Ltd|Corporation|Enterprises|Campus|Complexes|Facilities|Station|Power Station)\b/gi, '')
-    .trim();
-
-  return brand || raw.replace(/[()]/g, ' ').trim();
+// Strips parentheses, slashes, and buzzwords down to a 1-2 word core trade title that ALWAYS has live listings
+export function simplifyRoleKeyword(rawRole: string = '', rawSector: string = ''): string {
+  const combined = `${rawRole} ${rawSector}`.toLowerCase();
+  if (combined.includes('chemical') || combined.includes('petro') || combined.includes('pharma')) return 'Chemical Plant Operator';
+  if (combined.includes('cnc') || combined.includes('machin') || combined.includes('lathe') || combined.includes('fitter')) return 'CNC Machinist Technician';
+  if (combined.includes('ev') || combined.includes('battery') || combined.includes('auto') || combined.includes('electronics')) return 'Electrical Maintenance Engineer';
+  if (combined.includes('solar') || combined.includes('wind') || combined.includes('renewable') || combined.includes('power')) return 'Electrical Technician';
+  if (combined.includes('boiler') || combined.includes('weld') || combined.includes('fabricat')) return 'Mechanical Technician';
+  if (combined.includes('textile') || combined.includes('garment') || combined.includes('knit')) return 'Production Supervisor';
+  if (combined.includes('agro') || combined.includes('food')) return 'Quality Technician';
+  return 'Diploma Trainee Engineer';
 }
+
+// Extracts only the first 1-2 words of a company name (e.g., "TANFAC Industries Ltd (SIPCOT)" -> "TANFAC")
+export function cleanBrandName(rawCompany: string = ''): string {
+  if (!rawCompany) return '';
+  return rawCompany
+    .replace(/\(.*?\)/g, '')
+    .replace(/\b(private|pvt|limited|ltd|india|corporation|industries|company|sipcot|sidco|unit|plant|division)\b/gi, '')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .join(' ');
+}
+
+// Backwards-compatible alias for existing imports
+export const extractCleanBrandName = cleanBrandName;
 
 export function resolveDynamicDeepLink(params: DeepLinkParams): string {
   const {
@@ -106,8 +109,8 @@ export function resolveDynamicDeepLink(params: DeepLinkParams): string {
   const cleanSector = (sector || '').split(',')[0].trim();
   const cleanSkill = (skillName || '').trim();
   const cleanCompany = (companyName || '').trim();
-  const cleanBrand = extractCleanBrandName(cleanCompany) || cleanCompany;
-  const cleanRole = (roleTitle || '').trim();
+  const sanitizedCompany = cleanBrandName(cleanCompany) || cleanCompany;
+  const sanitizedRole = simplifyRoleKeyword(roleTitle, cleanSector);
 
   switch (category) {
     case 'SKILL_COURSE_GOVT': {
@@ -142,56 +145,61 @@ export function resolveDynamicDeepLink(params: DeepLinkParams): string {
 
     case 'GOVT_PSU_VACANCY': {
       if (portal === 'notification') {
-        return `https://www.google.com/search?q=${encodeURIComponent(`${cleanBrand} recruitment notification apprentice technician ${cleanDistrict} Tamil Nadu apply online`)}`;
+        return `https://www.google.com/search?q=${encodeURIComponent(`${sanitizedCompany} recruitment notification apprentice technician ${cleanDistrict} Tamil Nadu apply online`)}`;
       }
       // Opens live Google Jobs & Official Notification search filtered strictly to that PSU + District Recruitment
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${cleanBrand} ${cleanRole || 'technician engineer'} jobs in ${districtSearch} Tamil Nadu`)}`;
+      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${sanitizedCompany} ${sanitizedRole} jobs in ${districtSearch} Tamil Nadu`)}`;
     }
 
     case 'NAPS_APPRENTICESHIP': {
       // Opens live Apprenticeship & Trainee postings for that exact trade and district
-      const targetCadre = cleanRole || cleanSector || 'Technician';
-      const targetFirm = cleanBrand ? `${cleanBrand} ` : '';
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`Apprentice ${targetCadre} ${targetFirm}in ${districtSearch} Tamil Nadu`)}`;
+      const targetFirm = sanitizedCompany ? `${sanitizedCompany} ` : '';
+      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`Apprentice ${sanitizedRole} ${targetFirm}in ${districtSearch} Tamil Nadu`)}`;
     }
 
     case 'PRIVATE_FACTORY_JOB': {
-      // Route by requested job portal
+      const queryTerm = sanitizedCompany ? `${sanitizedCompany} ${sanitizedRole}` : sanitizedRole;
+
       if (portal === 'linkedin') {
-        // Clean query strictly without parentheses so LinkedIn parser succeeds
-        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(cleanBrand)}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
+        // Clean 1-2 word brand query strictly without parentheses or sentence clutter
+        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(sanitizedCompany || sanitizedRole)}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
       }
       if (portal === 'indeed') {
-        return `https://in.indeed.com/jobs?q=${encodeURIComponent(cleanBrand)}&l=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu`)}`;
+        return `https://in.indeed.com/jobs?q=${encodeURIComponent(sanitizedCompany || sanitizedRole)}&l=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu`)}`;
+      }
+      if (portal === 'naukri') {
+        const roleSlug = sanitizedRole.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        return `https://www.naukri.com/${encodeURIComponent(roleSlug)}-jobs-in-${encodeURIComponent(cleanDistrict.toLowerCase())}`;
       }
       if (portal === 'career') {
-        return `https://www.google.com/search?q=${encodeURIComponent(`${cleanBrand} careers plant jobs ${cleanDistrict} Tamil Nadu`)}`;
+        return `https://www.google.com/search?q=${encodeURIComponent(`${sanitizedCompany} careers plant jobs ${cleanDistrict} Tamil Nadu`)}`;
       }
-      // Default: Google Jobs Aggregator which pulls LinkedIn + Indeed + Naukri + Company portal simultaneously
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${cleanBrand} jobs in ${districtSearch} Tamil Nadu`)}`;
+      // Default: Google Jobs Aggregator which pulls LinkedIn + Naukri + Indeed + Company portal simultaneously
+      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${queryTerm} in ${districtSearch} Tamil Nadu`)}`;
     }
 
     case 'INTERNSHIP_APPLY': {
+      const queryTerm = sanitizedCompany ? `${sanitizedCompany} Intern Trainee` : `${sanitizedRole} Intern Trainee`;
       if (portal === 'linkedin') {
-        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(`${cleanBrand || cleanSector} Intern Trainee`.trim())}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
+        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(queryTerm)}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
       }
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${cleanBrand || cleanSector} intern trainee apprenticeship in ${districtSearch} Tamil Nadu`)}`;
+      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${queryTerm} in ${districtSearch} Tamil Nadu`)}`;
     }
 
     case 'SAFETY_LICENSE_PORTAL': {
       // Opens exact statutory certification / DISH / CEIG / Boiler / BIS standard search for that license
-      const targetCert = cleanSkill || cleanRole || 'Industrial Safety DISH';
+      const targetCert = cleanSkill || sanitizedRole || 'Industrial Safety DISH';
       return `https://www.google.com/search?q=${encodeURIComponent(`${targetCert} certification training Tamil Nadu site:tn.gov.in OR site:gov.in`)}`;
     }
 
     case 'VERIFIED_SOURCE_EVIDENCE': {
       // Opens the exact verified government gazette / industrial news evidence for that district claim
-      const headline = sourceHeadline || cleanBrand || 'SIPCOT Industrial Investment';
+      const headline = sourceHeadline || sanitizedCompany || 'SIPCOT Industrial Investment';
       return `https://www.google.com/search?q=${encodeURIComponent(`${headline} ${cleanDistrict} ${cleanSector} SIPCOT Tamil Nadu`)}`;
     }
 
     default:
-      return `https://www.google.com/search?q=${encodeURIComponent(`${cleanSkill || cleanBrand || cleanRole || cleanSector} ${cleanDistrict} Tamil Nadu`)}`;
+      return `https://www.google.com/search?q=${encodeURIComponent(`${cleanSkill || sanitizedCompany || sanitizedRole || cleanSector} ${cleanDistrict} Tamil Nadu`)}`;
   }
 }
 

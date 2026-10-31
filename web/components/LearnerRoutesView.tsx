@@ -1036,6 +1036,22 @@ function LearnerRoutesContent() {
                             <span>Indeed</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
+                          <a
+                            href={resolveDynamicDeepLink({
+                              category: "PRIVATE_FACTORY_JOB",
+                              district: selectedDistrict,
+                              companyName: emp,
+                              roleTitle: roadmap.qualification.startingCadre,
+                              portal: "naukri",
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] font-mono font-extrabold px-2 py-1 bg-white hover:bg-[#FAF9F5] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
+                            title="Direct search on Naukri.com"
+                          >
+                            <span>Naukri</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
                         </div>
                       </li>
                     ))}
