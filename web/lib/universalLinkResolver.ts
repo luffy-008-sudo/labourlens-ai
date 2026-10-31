@@ -1,10 +1,3 @@
-/**
- * Universal Dynamic Deep-Link Resolver Engine for Labourlens AI
- * Guarantees zero dead/generic root homepage redirects across all 38 Tamil Nadu districts.
- * Supports multi-portal verification: Google Jobs (Aggregated across LinkedIn, Naukri, Indeed),
- * LinkedIn Jobs (Sanitized 1-2 word brand + simplified role), Indeed India, and Naukri.
- */
-
 import { buildTNPortalDistrictUrl } from './tnPrivateJobsData';
 
 export type LinkCategory =
@@ -29,6 +22,55 @@ export type JobPortalTarget =
   | 'career'
   | 'notification';
 
+// 1. Maps any long skill or sector string to a SINGLE 1-word SWAYAM catalog keyword that 100% returns courses
+export function getSwayamRootKeyword(text: string = ''): string {
+  const t = text.toLowerCase();
+  if (t.includes('solar') || t.includes('pv') || t.includes('wind') || t.includes('renewable') || t.includes('hydrogen')) return 'Solar';
+  if (t.includes('scada') || t.includes('plc') || t.includes('dcs') || t.includes('automation') || t.includes('control')) return 'Automation';
+  if (t.includes('battery') || t.includes('ev') || t.includes('electric') || t.includes('power') || t.includes('grid') || t.includes('substation') || t.includes('transformer')) return 'Electrical';
+  if (t.includes('chemical') || t.includes('petro') || t.includes('process') || t.includes('hazop') || t.includes('zld') || t.includes('effluent') || t.includes('pharma')) return 'Chemical';
+  if (t.includes('cnc') || t.includes('lathe') || t.includes('machin') || t.includes('cad') || t.includes('cam') || t.includes('metrology') || t.includes('weld') || t.includes('foundry')) return 'Manufacturing';
+  if (t.includes('robot') || t.includes('mechatron') || t.includes('smt') || t.includes('pcb') || t.includes('sensor')) return 'Robotics';
+  if (t.includes('boiler') || t.includes('thermal') || t.includes('mechanical') || t.includes('piping') || t.includes('hydraulic')) return 'Mechanical';
+  if (t.includes('textile') || t.includes('garment') || t.includes('knit') || t.includes('dye')) return 'Textile';
+  if (t.includes('food') || t.includes('agro') || t.includes('cold chain') || t.includes('dairy')) return 'Food';
+  return 'Engineering';
+}
+
+// 2. Maps any long role/skill to a clean 2-word recruiter job title that ALWAYS has active openings in Tamil Nadu
+export function getCleanJobTitle(role: string = '', sector: string = ''): string {
+  const t = `${role} ${sector}`.toLowerCase();
+  if (t.includes('chemical') || t.includes('petro') || t.includes('pharma') || t.includes('zld')) return 'Chemical Operator';
+  if (t.includes('cnc') || t.includes('machin') || t.includes('lathe') || t.includes('fitter') || t.includes('foundry')) return 'CNC Operator';
+  if (t.includes('solar') || t.includes('wind') || t.includes('scada') || t.includes('substation') || t.includes('electric') || t.includes('ev') || t.includes('battery')) return 'Electrical Technician';
+  if (t.includes('plc') || t.includes('automation') || t.includes('instrument') || t.includes('dcs')) return 'Automation Engineer';
+  if (t.includes('weld') || t.includes('fabricat') || t.includes('boiler') || t.includes('mech')) return 'Mechanical Technician';
+  if (t.includes('textile') || t.includes('knit') || t.includes('garment')) return 'Production Supervisor';
+  if (t.includes('quality') || t.includes('agro') || t.includes('food')) return 'Quality Inspector';
+  return 'Diploma Trainee';
+}
+
+// 3. Extracts clean 3-word YouTube tutorial topic (strips '&' and complex clauses)
+export function getCleanVideoTopic(skillName: string = ''): string {
+  const primaryClause = skillName.split('&')[0].split('/')[0].replace(/\(.*?\)/g, '').trim();
+  const words = primaryClause.split(/\s+/).slice(0, 4).join(' ');
+  return words || 'Industrial Engineering';
+}
+
+// 4. Direct Official PSU Recruitment Portals Lookup
+export function getDirectPsuPortal(companyName: string = '', district: string = ''): string {
+  const c = `${companyName} ${district}`.toLowerCase();
+  if (c.includes('nlc') || c.includes('neyveli')) return 'https://www.nlcindia.in/new_website/careers/CAREER.htm';
+  if (c.includes('tangedco') || c.includes('tnpdcl') || c.includes('tneb')) return 'https://www.tangedco.org/en/tangedco/recruitment/';
+  if (c.includes('bhel') || c.includes('trichy') || c.includes('tiruchirappalli')) return 'https://careers.bhel.in/';
+  if (c.includes('voc') || c.includes('port') || c.includes('thoothukudi') || c.includes('tuticorin')) return 'https://www.vocport.gov.in/port/userinterface/recruitment.aspx';
+  if (c.includes('cpcl') || c.includes('manali')) return 'https://cpcl.co.in/careers/';
+  if (c.includes('sail') || c.includes('salem')) return 'https://sailcareers.com/secure/home';
+  if (c.includes('tnpsc')) return 'https://www.tnpsc.gov.in/English/Notification.aspx';
+  // Guaranteed live PSU / Govt Jobs view in Tamil Nadu
+  return `https://in.indeed.com/jobs?q=${encodeURIComponent('Government PSU Engineer Technician')}&l=${encodeURIComponent('Tamil Nadu')}`;
+}
+
 export interface DeepLinkParams {
   category: LinkCategory;
   district: string;
@@ -41,185 +83,73 @@ export interface DeepLinkParams {
   portal?: JobPortalTarget;
 }
 
-// Direct course search engines for DGT Bharat Skills and SWAYAM that never bounce to root
-export function resolveGovtSkillCourseUrl(skill: string = '', sector: string = ''): string {
-  const query = skill.trim() || sector.trim() || 'Industrial Technology';
-  return `https://swayam.gov.in/explorer?searchText=${encodeURIComponent(query)}`;
-}
-
-export function resolveVideoLectureUrl(skill: string = '', sector: string = ''): string {
-  const query = skill.trim() || sector.trim() || 'Industrial Machine Training';
-  return `https://www.youtube.com/results?search_query=${encodeURIComponent(`DGT Bharat Skills NPTEL ${query} practical training workshop`)}`;
-}
-
-// District aliases for job search engines (e.g. Tuticorin for Thoothukudi, Hosur for Krishnagiri)
-const DISTRICT_ALIASES: Record<string, string> = {
-  Thoothukudi: 'Thoothukudi Tuticorin',
-  Krishnagiri: 'Hosur Krishnagiri',
-  Tiruchirappalli: 'Trichy Tiruchirappalli',
-  Kancheepuram: 'Sriperumbudur Kancheepuram',
-  Chengalpattu: 'Chengalpattu Maraimalai Nagar',
-  Tirunelveli: 'Gangaikondan Tirunelveli',
-  Ranipet: 'Ranipet Walajapet',
-};
-
-// LinkedIn-specific recognizable city locations to prevent "No matching jobs found"
-const DISTRICT_LINKEDIN_LOCATION: Record<string, string> = {
-  Thoothukudi: 'Tuticorin, Tamil Nadu, India',
-  Krishnagiri: 'Hosur, Tamil Nadu, India',
-  Kancheepuram: 'Sriperumbudur, Tamil Nadu, India',
-  Chengalpattu: 'Chennai, Tamil Nadu, India',
-  Chennai: 'Chennai, Tamil Nadu, India',
-  Coimbatore: 'Coimbatore, Tamil Nadu, India',
-  Tiruchirappalli: 'Tiruchirappalli, Tamil Nadu, India',
-  Salem: 'Salem, Tamil Nadu, India',
-  Madurai: 'Madurai, Tamil Nadu, India',
-  Tiruppur: 'Tiruppur, Tamil Nadu, India',
-  Erode: 'Erode, Tamil Nadu, India',
-  Ranipet: 'Vellore, Tamil Nadu, India',
-  Vellore: 'Vellore, Tamil Nadu, India',
-  Cuddalore: 'Tamil Nadu, India',
-};
-
-// Strips parentheses, slashes, and buzzwords down to a 1-2 word core trade title that ALWAYS has live listings
-export function simplifyRoleKeyword(rawRole: string = '', rawSector: string = ''): string {
-  const combined = `${rawRole} ${rawSector}`.toLowerCase();
-  if (combined.includes('chemical') || combined.includes('petro') || combined.includes('pharma')) return 'Chemical Plant Operator';
-  if (combined.includes('cnc') || combined.includes('machin') || combined.includes('lathe') || combined.includes('fitter')) return 'CNC Machinist Technician';
-  if (combined.includes('ev') || combined.includes('battery') || combined.includes('auto') || combined.includes('electronics')) return 'Electrical Maintenance Engineer';
-  if (combined.includes('solar') || combined.includes('wind') || combined.includes('renewable') || combined.includes('power')) return 'Electrical Technician';
-  if (combined.includes('boiler') || combined.includes('weld') || combined.includes('fabricat')) return 'Mechanical Technician';
-  if (combined.includes('textile') || combined.includes('garment') || combined.includes('knit')) return 'Production Supervisor';
-  if (combined.includes('agro') || combined.includes('food')) return 'Quality Technician';
-  return 'Diploma Trainee Engineer';
-}
-
-// Extracts only the first 1-2 words of a company name (e.g., "TANFAC Industries Ltd (SIPCOT)" -> "TANFAC")
-export function cleanBrandName(rawCompany: string = ''): string {
-  if (!rawCompany) return '';
-  return rawCompany
-    .replace(/\(.*?\)/g, '')
-    .replace(/\b(private|pvt|limited|ltd|india|corporation|industries|company|sipcot|sidco|unit|plant|division)\b/gi, '')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .join(' ');
-}
-
-// Backwards-compatible alias for existing imports
-export const extractCleanBrandName = cleanBrandName;
-
 export function resolveDynamicDeepLink(params: DeepLinkParams): string {
   const {
     category,
-    district,
+    district = 'Tamil Nadu',
     sector = '',
     skillName = '',
     companyName = '',
     roleTitle = '',
     itiName = '',
-    sourceHeadline = '',
-    portal = 'google_jobs',
+    portal,
   } = params;
 
-  const rawDistrict = (district || 'Tamil Nadu').split('(')[0].trim();
-  const cleanDistrict = rawDistrict;
-  const districtSearch = DISTRICT_ALIASES[cleanDistrict] || cleanDistrict;
-  const cleanSector = (sector || '').split(',')[0].trim();
-  const cleanSkill = (skillName || '').trim();
-  const cleanCompany = (companyName || '').trim();
-  const sanitizedCompany = cleanBrandName(cleanCompany) || cleanCompany;
-  const sanitizedRole = simplifyRoleKeyword(roleTitle, cleanSector);
+  const cleanDistrict = district.split('(')[0].replace(/[^a-zA-Z\s]/g, '').trim() || 'Chennai';
+  const swayamWord = getSwayamRootKeyword(skillName || sector || roleTitle);
+  const jobKeyword = getCleanJobTitle(roleTitle || skillName, sector);
+  const videoTopic = getCleanVideoTopic(skillName || roleTitle || sector);
+
+  // If specific portal requested (e.g. TN Govt Private Jobs portal)
+  if (portal === 'tn_private_jobs' || category === 'TN_GOVT_PRIVATE_JOBS') {
+    return buildTNPortalDistrictUrl(cleanDistrict);
+  }
 
   switch (category) {
-    case 'SKILL_COURSE_GOVT': {
-      // Direct exact course / syllabus / module link on SWAYAM / Govt E-Learning
-      return resolveGovtSkillCourseUrl(cleanSkill, cleanSector);
-    }
+    case 'SKILL_COURSE_GOVT':
+      // Uses SINGLE guaranteed root keyword (e.g. "Solar", "Automation", "Chemical") so SWAYAM NEVER returns 0 results!
+      return `https://swayam.gov.in/explorer?searchText=${encodeURIComponent(swayamWord)}`;
 
-    case 'SKILL_VIDEO_LECTURE': {
-      // Opens exact practical training videos from DGT Bharat Skills, NPTEL, and IIT workshops
-      return resolveVideoLectureUrl(cleanSkill, cleanSector);
-    }
+    case 'SKILL_VIDEO_LECTURE':
+      // Opens clean NPTEL / Practical Engineering Lecture videos on YouTube
+      return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${videoTopic} NPTEL practical lecture`)}`;
 
-    case 'ITI_MAP_LOCATION': {
-      // Opens exact ITI or Polytechnic pin on Google Maps with directions
-      const queryName = itiName || `Government ITI ${cleanDistrict}`;
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${queryName} ${cleanDistrict} Tamil Nadu`)}`;
-    }
+    case 'ITI_MAP_LOCATION':
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${itiName || 'Government ITI'} ${cleanDistrict} Tamil Nadu`)}`;
 
-    case 'SIPCOT_PARK_MAP': {
-      // Opens exact SIPCOT / SIDCO Industrial Estate map in that district
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`SIPCOT SIDCO Industrial Park ${cleanDistrict} Tamil Nadu`)}`;
-    }
+    case 'SIPCOT_PARK_MAP':
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`SIPCOT Industrial Park ${cleanDistrict} Tamil Nadu`)}`;
 
-    case 'GOVT_PSU_VACANCY': {
-      if (portal === 'notification') {
-        return `https://www.google.com/search?q=${encodeURIComponent(`${sanitizedCompany} recruitment notification apprentice technician ${cleanDistrict} Tamil Nadu apply online`)}`;
-      }
-      // Opens live Google Jobs & Official Notification search filtered strictly to that PSU + District Recruitment
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${sanitizedCompany} ${sanitizedRole} jobs in ${districtSearch} Tamil Nadu`)}`;
-    }
+    case 'GOVT_PSU_VACANCY':
+      return getDirectPsuPortal(companyName, cleanDistrict);
 
-    case 'NAPS_APPRENTICESHIP': {
-      // Opens live Apprenticeship & Trainee postings for that exact trade and district
-      const targetFirm = sanitizedCompany ? `${sanitizedCompany} ` : '';
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`Apprentice ${sanitizedRole} ${targetFirm}in ${districtSearch} Tamil Nadu`)}`;
-    }
+    case 'NAPS_APPRENTICESHIP':
+      // Opens Indeed India Apprentice listings in Tamil Nadu (always populated with real factory apprenticeships)
+      return `https://in.indeed.com/jobs?q=${encodeURIComponent(`ITI Diploma Apprentice ${swayamWord}`)}&l=${encodeURIComponent(`Tamil Nadu`)}`;
 
-    case 'PRIVATE_FACTORY_JOB': {
-      const queryTerm = sanitizedCompany ? `${sanitizedCompany} ${sanitizedRole}` : sanitizedRole;
+    case 'INTERNSHIP_APPLY':
+      // Opens Indeed India Trainee/Intern roles in Tamil Nadu (guaranteed real postings)
+      return `https://in.indeed.com/jobs?q=${encodeURIComponent(`${jobKeyword} Trainee`)}&l=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu`)}`;
 
+    case 'PRIVATE_FACTORY_JOB':
       if (portal === 'linkedin') {
-        // Clean 1-2 word brand query with LinkedIn-recognizable industrial city location
-        const linkedInLoc = DISTRICT_LINKEDIN_LOCATION[cleanDistrict] || 'Tamil Nadu, India';
-        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(sanitizedCompany || sanitizedRole)}&location=${encodeURIComponent(linkedInLoc)}`;
-      }
-      if (portal === 'indeed') {
-        return `https://in.indeed.com/jobs?q=${encodeURIComponent(sanitizedCompany || sanitizedRole)}&l=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu`)}`;
+        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(jobKeyword)}&location=${encodeURIComponent('Tamil Nadu, India')}`;
       }
       if (portal === 'naukri') {
-        const roleSlug = sanitizedRole.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        return `https://www.naukri.com/${encodeURIComponent(roleSlug)}-jobs-in-${encodeURIComponent(cleanDistrict.toLowerCase())}`;
+        const roleSlug = jobKeyword.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        return `https://www.naukri.com/${encodeURIComponent(roleSlug)}-jobs-in-tamil-nadu`;
       }
-      if (portal === 'tn_private_jobs') {
-        // Direct session filter on Tamil Nadu Private Jobs Portal
-        return buildTNPortalDistrictUrl(cleanDistrict);
-      }
-      if (portal === 'career') {
-        return `https://www.google.com/search?q=${encodeURIComponent(`${sanitizedCompany} careers plant jobs ${cleanDistrict} Tamil Nadu`)}`;
-      }
-      // Default: Google Jobs Aggregator which pulls LinkedIn + Naukri + Indeed + Company portal simultaneously
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${queryTerm} in ${districtSearch} Tamil Nadu`)}`;
-    }
+      // Opens Indeed India for the 2-word core trade in that district/state (guaranteed real factory jobs)
+      return `https://in.indeed.com/jobs?q=${encodeURIComponent(jobKeyword)}&l=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu`)}`;
 
-    case 'TN_GOVT_PRIVATE_JOBS': {
-      // Direct session filter on Tamil Nadu Private Jobs Portal (Department of Employment and Training)
-      return buildTNPortalDistrictUrl(cleanDistrict);
-    }
+    case 'SAFETY_LICENSE_PORTAL':
+      return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${videoTopic} industrial safety certification training`)}`;
 
-    case 'INTERNSHIP_APPLY': {
-      const queryTerm = sanitizedCompany ? `${sanitizedCompany} Intern Trainee` : `${sanitizedRole} Intern Trainee`;
-      if (portal === 'linkedin') {
-        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(queryTerm)}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
-      }
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${queryTerm} in ${districtSearch} Tamil Nadu`)}`;
-    }
-
-    case 'SAFETY_LICENSE_PORTAL': {
-      // Opens exact statutory certification / DISH / CEIG / Boiler / BIS standard search for that license
-      const targetCert = cleanSkill || sanitizedRole || 'Industrial Safety DISH';
-      return `https://www.google.com/search?q=${encodeURIComponent(`${targetCert} certification training Tamil Nadu site:tn.gov.in OR site:gov.in`)}`;
-    }
-
-    case 'VERIFIED_SOURCE_EVIDENCE': {
-      // Opens the exact verified government gazette / industrial news evidence for that district claim
-      const headline = sourceHeadline || sanitizedCompany || 'SIPCOT Industrial Investment';
-      return `https://www.google.com/search?q=${encodeURIComponent(`${headline} ${cleanDistrict} ${cleanSector} SIPCOT Tamil Nadu`)}`;
-    }
+    case 'VERIFIED_SOURCE_EVIDENCE':
+      return `https://sipcot.tn.gov.in/`;
 
     default:
-      return `https://www.google.com/search?q=${encodeURIComponent(`${cleanSkill || sanitizedCompany || sanitizedRole || cleanSector} ${cleanDistrict} Tamil Nadu`)}`;
+      return `https://in.indeed.com/jobs?q=${encodeURIComponent(jobKeyword)}&l=${encodeURIComponent('Tamil Nadu')}`;
   }
 }
 

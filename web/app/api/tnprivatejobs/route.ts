@@ -105,3 +105,4 @@ export async function GET(request: Request) {
   CACHE[cacheKey] = { timestamp: now, data: payload };
   return NextResponse.json(payload);
 }
+

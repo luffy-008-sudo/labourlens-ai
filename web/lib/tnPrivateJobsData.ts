@@ -95,3 +95,4 @@ export function buildTNPortalDistrictUrl(districtName: string): string {
 export function buildTNPortalSectorUrl(sectorId: number = 34): string {
   return `https://www.tnprivatejobs.tn.gov.in/Home/jobsdetails_page/sector/${sectorId}`;
 }
+

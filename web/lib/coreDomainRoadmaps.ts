@@ -113,7 +113,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Chemical Process Control & Instrumentation",
         platform: "NPTEL",
-        url: "https://swayam.gov.in/explorer?searchText=Chemical+Process+Control",
+        url: "https://swayam.gov.in/explorer?searchText=Chemical",
         duration: "8 Weeks",
         cost: "100% Free (Govt IIT/IISc)",
         topics: "Feedback loops, P&ID diagrams, PLC/SCADA logic & plant dynamics",
@@ -175,7 +175,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Electric Vehicles and Battery Management Systems",
         platform: "NPTEL",
-        url: "https://swayam.gov.in/explorer?searchText=Electric+Vehicles+Battery+Management",
+        url: "https://swayam.gov.in/explorer?searchText=Electrical",
         duration: "12 Weeks",
         cost: "100% Free (IIT Madras)",
         topics: "Cell chemistry, thermal runaway, BMS algorithms & motor controllers",
@@ -237,7 +237,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Renewable Energy Engineering and Technology",
         platform: "NPTEL",
-        url: "https://swayam.gov.in/explorer?searchText=Renewable+Energy+Engineering",
+        url: "https://swayam.gov.in/explorer?searchText=Solar",
         duration: "12 Weeks",
         cost: "100% Free (IIT Kharagpur)",
         topics: "Wind aerodynamics, solar irradiance modeling, inverter topologies & microgrids",
@@ -299,7 +299,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Advanced CNC Machining and Metrology",
         platform: "NPTEL",
-        url: "https://swayam.gov.in/explorer?searchText=CNC+Machining+Metrology",
+        url: "https://swayam.gov.in/explorer?searchText=Manufacturing",
         duration: "8 Weeks",
         cost: "100% Free (IIT Kanpur)",
         topics: "Tool-life optimization, surface finish, multi-axis interpolation & GD&T",
@@ -361,7 +361,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Welding Engineering and Non-Destructive Evaluation",
         platform: "NPTEL",
-        url: "https://swayam.gov.in/explorer?searchText=Welding+Engineering+NDT",
+        url: "https://swayam.gov.in/explorer?searchText=Mechanical",
         duration: "12 Weeks",
         cost: "100% Free (IIT Roorkee)",
         topics: "Phase diagrams, cracking mechanisms, weld pool physics & ultrasound NDT",
@@ -423,7 +423,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Principles of Textile Engineering and Fabric Formation",
         platform: "NPTEL",
-        url: "https://swayam.gov.in/explorer?searchText=Textile+Engineering+Fabric",
+        url: "https://swayam.gov.in/explorer?searchText=Textile",
         duration: "12 Weeks",
         cost: "100% Free (IIT Delhi)",
         topics: "Loop formation, yarn tension dynamics, technical textiles & color physics",
@@ -485,7 +485,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Food Process Engineering and Cold Chain Management",
         platform: "NPTEL",
-        url: "https://swayam.gov.in/explorer?searchText=Food+Process+Engineering+Cold+Chain",
+        url: "https://swayam.gov.in/explorer?searchText=Food",
         duration: "12 Weeks",
         cost: "100% Free (IIT Kharagpur)",
         topics: "Psychrometrics, freezing kinetics, pasteurization math & packaging barrier properties",
