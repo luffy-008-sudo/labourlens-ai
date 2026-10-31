@@ -113,7 +113,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Chemical Process Control & Instrumentation",
         platform: "NPTEL",
-        url: "https://nptel.ac.in/courses",
+        url: "https://swayam.gov.in/explorer?searchText=Chemical+Process+Control",
         duration: "8 Weeks",
         cost: "100% Free (Govt IIT/IISc)",
         topics: "Feedback loops, P&ID diagrams, PLC/SCADA logic & plant dynamics",
@@ -121,7 +121,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Attendant Operator & Instrument Mechanic (Chemical Plant - AOCP/IMCP)",
         platform: "DGT Bharat Skills",
-        url: "https://bharatskills.gov.in",
+        url: "https://www.youtube.com/results?search_query=DGT+Bharat+Skills+AOCP+Chemical+Plant+Operator+practical+training",
         duration: "Self-Paced e-Learning",
         cost: "100% Free (Ministry of Skill Development)",
         topics: "Industrial chemistry, heat exchangers, fluid flow & safety regulations",
@@ -129,7 +129,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Industrial Process Safety & Hazard Management",
         platform: "Skill India Digital",
-        url: "https://www.skillindiadigital.gov.in",
+        url: "https://www.skillindiadigital.gov.in/courses?search=Chemical+Process+Safety",
         duration: "4 Weeks",
         cost: "100% Free (NSDC Certified)",
         topics: "HAZOP, OSHA 1910.119, chemical spill mitigation & PPE Level-A/B/C",
@@ -175,7 +175,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Electric Vehicles and Battery Management Systems",
         platform: "NPTEL",
-        url: "https://nptel.ac.in/courses",
+        url: "https://swayam.gov.in/explorer?searchText=Electric+Vehicles+Battery+Management",
         duration: "12 Weeks",
         cost: "100% Free (IIT Madras)",
         topics: "Cell chemistry, thermal runaway, BMS algorithms & motor controllers",
@@ -183,7 +183,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Mechanic Electric Vehicle (MEV) Curriculum",
         platform: "DGT Bharat Skills",
-        url: "https://bharatskills.gov.in",
+        url: "https://www.youtube.com/results?search_query=DGT+Bharat+Skills+Mechanic+Electric+Vehicle+training",
         duration: "Self-Paced e-Learning",
         cost: "100% Free (DGT Govt of India)",
         topics: "BLDC motors, regen braking, high-voltage interlocks & wiring harnesses",
@@ -191,7 +191,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Automotive Robotics & Electric Vehicle Technician",
         platform: "Skill India Digital",
-        url: "https://www.skillindiadigital.gov.in",
+        url: "https://www.skillindiadigital.gov.in/courses?search=Electric+Vehicle+Technician",
         duration: "6 Weeks",
         cost: "100% Free (ASDC Certified)",
         topics: "Battery pack casing assembly, torque tool calibration & 5S shopfloor",
@@ -237,7 +237,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Renewable Energy Engineering and Technology",
         platform: "NPTEL",
-        url: "https://nptel.ac.in/courses",
+        url: "https://swayam.gov.in/explorer?searchText=Renewable+Energy+Engineering",
         duration: "12 Weeks",
         cost: "100% Free (IIT Kharagpur)",
         topics: "Wind aerodynamics, solar irradiance modeling, inverter topologies & microgrids",
@@ -245,7 +245,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Solar Technician (Electrical) & Wind Plant Mechanic",
         platform: "DGT Bharat Skills",
-        url: "https://bharatskills.gov.in",
+        url: "https://www.youtube.com/results?search_query=DGT+Bharat+Skills+Solar+Technician+Electrical+training",
         duration: "Self-Paced e-Learning",
         cost: "100% Free (Ministry of Skill Development)",
         topics: "PV array installation, DC combiner boxes, earthing & lightning protection",
@@ -253,7 +253,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Surya Mitra & Pawan Mitra Clean Energy Technician",
         platform: "Skill India Digital",
-        url: "https://www.skillindiadigital.gov.in",
+        url: "https://www.skillindiadigital.gov.in/courses?search=Surya+Mitra+Solar+Technician",
         duration: "12 Weeks (Subsidized)",
         cost: "100% Free (NISE / MNRE)",
         topics: "Grid connection standards, net-metering & power purchase compliance",
@@ -299,7 +299,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Advanced CNC Machining and Metrology",
         platform: "NPTEL",
-        url: "https://nptel.ac.in/courses",
+        url: "https://swayam.gov.in/explorer?searchText=CNC+Machining+Metrology",
         duration: "8 Weeks",
         cost: "100% Free (IIT Kanpur)",
         topics: "Tool-life optimization, surface finish, multi-axis interpolation & GD&T",
@@ -307,7 +307,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Machinist & Tool and Die Maker (Press Tools, Jigs & Fixtures)",
         platform: "DGT Bharat Skills",
-        url: "https://bharatskills.gov.in",
+        url: "https://www.youtube.com/results?search_query=DGT+Bharat+Skills+Machinist+Tool+and+Die+Maker+training",
         duration: "Self-Paced e-Learning",
         cost: "100% Free (DGT Govt of India)",
         topics: "Blueprint interpretation, carbide inserts, feed-speed math & tolerance limits",
@@ -315,7 +315,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Smart Factory Automation & PLC Programmer",
         platform: "Skill India Digital",
-        url: "https://www.skillindiadigital.gov.in",
+        url: "https://www.skillindiadigital.gov.in/courses?search=PLC+SCADA+Automation",
         duration: "6 Weeks",
         cost: "100% Free (Capital Goods Skill Council)",
         topics: "Ladder logic, HMI interface design, sensor interfacing & motor drives",
@@ -361,7 +361,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Welding Engineering and Non-Destructive Evaluation",
         platform: "NPTEL",
-        url: "https://nptel.ac.in/courses",
+        url: "https://swayam.gov.in/explorer?searchText=Welding+Engineering+NDT",
         duration: "12 Weeks",
         cost: "100% Free (IIT Roorkee)",
         topics: "Phase diagrams, cracking mechanisms, weld pool physics & ultrasound NDT",
@@ -369,7 +369,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Welder (Structural, Pipe & Pressure Vessel)",
         platform: "DGT Bharat Skills",
-        url: "https://bharatskills.gov.in",
+        url: "https://www.youtube.com/results?search_query=DGT+Bharat+Skills+Welder+structural+pipe+training",
         duration: "Self-Paced e-Learning",
         cost: "100% Free (DGT Govt of India)",
         topics: "ASME Section IX codes, AWS D1.1, bevel preparation & purge gas control",
@@ -377,7 +377,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Pressure Vessel Fabrication & Metallurgy Inspector",
         platform: "Skill India Digital",
-        url: "https://www.skillindiadigital.gov.in",
+        url: "https://www.skillindiadigital.gov.in/courses?search=Pressure+Vessel+Fabrication",
         duration: "8 Weeks",
         cost: "100% Free (IIW-India Certified)",
         topics: "Boiler codes, weld joint design, visual inspection & defect identification",
@@ -423,7 +423,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Principles of Textile Engineering and Fabric Formation",
         platform: "NPTEL",
-        url: "https://nptel.ac.in/courses",
+        url: "https://swayam.gov.in/explorer?searchText=Textile+Engineering+Fabric",
         duration: "12 Weeks",
         cost: "100% Free (IIT Delhi)",
         topics: "Loop formation, yarn tension dynamics, technical textiles & color physics",
@@ -431,7 +431,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Textile Mechatronics & Knitting Machine Operator",
         platform: "DGT Bharat Skills",
-        url: "https://bharatskills.gov.in",
+        url: "https://www.youtube.com/results?search_query=DGT+Bharat+Skills+Textile+Knitting+Machine+training",
         duration: "Self-Paced e-Learning",
         cost: "100% Free (DGT Govt of India)",
         topics: "Needle selection, cam tracks, electronic feeder timing & fabric defect fixes",
@@ -439,7 +439,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Sustainable Textile Processing & ZLD Operations",
         platform: "Skill India Digital",
-        url: "https://www.skillindiadigital.gov.in",
+        url: "https://www.skillindiadigital.gov.in/courses?search=Textile+Processing+ZLD",
         duration: "6 Weeks",
         cost: "100% Free (Textile Sector Skill Council)",
         topics: "Effluent treatment chemistry, RO recovery optimization & OEKO-TEX standards",
@@ -485,7 +485,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Food Process Engineering and Cold Chain Management",
         platform: "NPTEL",
-        url: "https://nptel.ac.in/courses",
+        url: "https://swayam.gov.in/explorer?searchText=Food+Process+Engineering+Cold+Chain",
         duration: "12 Weeks",
         cost: "100% Free (IIT Kharagpur)",
         topics: "Psychrometrics, freezing kinetics, pasteurization math & packaging barrier properties",
@@ -493,7 +493,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "Refrigeration and Air Conditioning (RAC) Technician",
         platform: "DGT Bharat Skills",
-        url: "https://bharatskills.gov.in",
+        url: "https://www.youtube.com/results?search_query=DGT+Bharat+Skills+Refrigeration+and+Air+Conditioning+training",
         duration: "Self-Paced e-Learning",
         cost: "100% Free (DGT Govt of India)",
         topics: "Compressor overhaul, refrigerant leak detection, cold room insulation & thermals",
@@ -501,7 +501,7 @@ export const CORE_DOMAINS: Record<string, DomainProfile> = {
       {
         title: "FSSAI FoSTaC Food Safety Supervisor & Line In-Charge",
         platform: "Skill India Digital",
-        url: "https://www.skillindiadigital.gov.in",
+        url: "https://www.skillindiadigital.gov.in/courses?search=FSSAI+FoSTaC+Food+Safety",
         duration: "4 Weeks",
         cost: "100% Free (Food Industry Capacity & Skill Initiative)",
         topics: "Good Manufacturing Practices (GMP), allergen control & HACCP validation",
@@ -754,15 +754,18 @@ export function getPersonalizedRoadmap(
         objective: qual.customActionMonths1_2,
         recommendedCourses: domain.foundationCourses.map((c) => ({
           ...c,
-          url: resolveDynamicDeepLink({
-            category:
-              c.platform.toLowerCase().includes("video") || c.platform.toLowerCase().includes("nptel")
-                ? "SKILL_VIDEO_LECTURE"
-                : "SKILL_COURSE_GOVT",
-            district: districtReg.district,
-            sector: domain.name,
-            skillName: c.title,
-          }),
+          url:
+            c.url && !c.url.endsWith("bharatskills.gov.in") && !c.url.endsWith("nptel.ac.in/courses")
+              ? c.url
+              : resolveDynamicDeepLink({
+                  category:
+                    c.platform.toLowerCase().includes("video") || c.platform.toLowerCase().includes("nptel")
+                      ? "SKILL_VIDEO_LECTURE"
+                      : "SKILL_COURSE_GOVT",
+                  district: districtReg.district,
+                  sector: domain.name,
+                  skillName: c.title,
+                }),
         })),
         milestone: "100% Free Government Verified Online Certification",
       },

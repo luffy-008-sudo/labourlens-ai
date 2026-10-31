@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Compass,
@@ -36,6 +36,7 @@ import {
   getPrimaryDomainForDistrict,
 } from "@/lib/coreDomainRoadmaps";
 import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
+import { getTNPortalDistrictInfo } from "@/lib/tnPrivateJobsData";
 
 function matchDomainFromSector(sectorQuery: string | null): string {
   if (!sectorQuery) return "chemical";
@@ -209,6 +210,7 @@ function LearnerRoutesContent() {
   const { lang } = useTranslation();
   const { profile, selectedDistrict: contextDistrict, selectedDomain: contextDomain, setSelectedDistrict: setGlobalDistrict, updateProfile } = useUserProfile();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const queryDistrict = searchParams.get("district");
   const querySector = searchParams.get("sector");
 
@@ -220,23 +222,19 @@ function LearnerRoutesContent() {
 
   // Sync with searchParams, context, or Profile
   useEffect(() => {
-    const activeDist = queryDistrict || contextDistrict || profile?.district;
-    if (activeDist) {
-      setSelectedDistrict(activeDist);
-      if (!querySector && !contextDomain) {
-        setSelectedDomain(getPrimaryDomainForDistrict(activeDist));
-      }
-    }
+    const activeDist = queryDistrict || contextDistrict || profile?.district || "Krishnagiri";
+    setSelectedDistrict(activeDist);
 
-    const activeSector = querySector || contextDomain;
-    if (activeSector) {
-      setSelectedDomain(matchDomainFromSector(activeSector));
+    if (querySector) {
+      setSelectedDomain(matchDomainFromSector(querySector));
+    } else {
+      setSelectedDomain(getPrimaryDomainForDistrict(activeDist));
     }
 
     if (profile?.qualification) {
       setSelectedQual(profile.qualification);
     }
-  }, [queryDistrict, querySector, contextDistrict, contextDomain, profile]);
+  }, [queryDistrict, querySector, contextDistrict, profile?.district, profile?.qualification]);
 
   // Synchronize Target District -> Core Domain automatically
   const handleDistrictChange = (newDistrict: string) => {
@@ -244,6 +242,13 @@ function LearnerRoutesContent() {
     setGlobalDistrict(newDistrict);
     const autoDomain = getPrimaryDomainForDistrict(newDistrict);
     setSelectedDomain(autoDomain);
+    // Replace URL without querySector so domain auto-syncs cleanly
+    router.replace(`/routes?district=${encodeURIComponent(newDistrict)}`, { scroll: false });
+  };
+
+  const handleDomainChange = (newDomain: string) => {
+    setSelectedDomain(newDomain);
+    router.replace(`/routes?district=${encodeURIComponent(selectedDistrict)}&sector=${encodeURIComponent(newDomain)}`, { scroll: false });
   };
 
   const roadmap = getPersonalizedRoadmap(selectedDistrict, selectedDomain, selectedQual);
@@ -503,7 +508,7 @@ function LearnerRoutesContent() {
             </span>
             <select
               value={selectedDomain}
-              onChange={(e) => setSelectedDomain(e.target.value)}
+              onChange={(e) => handleDomainChange(e.target.value)}
               className="w-full text-base font-extrabold font-mono bg-[#FAF9F5] border-2 border-black rounded-xl p-3 text-black focus:outline-none focus:bg-white shadow-[2px_2px_0px_0px_#000000]"
             >
               {Object.values(CORE_DOMAINS).map((dom) => (
@@ -872,6 +877,20 @@ function LearnerRoutesContent() {
               <div className="flex flex-wrap gap-2.5 shrink-0">
                 <a
                   href={resolveDynamicDeepLink({
+                    category: "TN_GOVT_PRIVATE_JOBS",
+                    district: selectedDistrict,
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 bg-[#F5C518] hover:bg-[#e6b814] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-1.5"
+                  title="Official Department of Employment and Training (Govt of Tamil Nadu) Private Jobs Portal"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+                  <span>TN Govt Private Jobs ({getTNPortalDistrictInfo(selectedDistrict).liveVacancies} Live) ↗</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+                <a
+                  href={resolveDynamicDeepLink({
                     category: "NAPS_APPRENTICESHIP",
                     district: selectedDistrict,
                     sector: roadmap.domain.name,
@@ -1050,6 +1069,22 @@ function LearnerRoutesContent() {
                             title="Direct search on Naukri.com"
                           >
                             <span>Naukri</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                          <a
+                            href={resolveDynamicDeepLink({
+                              category: "PRIVATE_FACTORY_JOB",
+                              district: selectedDistrict,
+                              companyName: emp,
+                              roleTitle: roadmap.qualification.startingCadre,
+                              portal: "tn_private_jobs",
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] font-mono font-extrabold px-2 py-1 bg-[#FAF9F5] hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
+                            title="Official Tamil Nadu Government Private Jobs Portal"
+                          >
+                            <span>TN Portal</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>

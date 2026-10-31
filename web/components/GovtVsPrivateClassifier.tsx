@@ -18,6 +18,7 @@ import { getDistrictRegistry, DistrictRegistryEntry } from "@/lib/tnDistrictsReg
 import { TN_38_DISTRICTS } from "@/lib/districtsData";
 import { useTranslation } from "@/lib/i18n";
 import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
+import { getTNPortalDistrictInfo } from "@/lib/tnPrivateJobsData";
 
 interface GovtVsPrivateClassifierProps {
   initialDistrict?: string;
@@ -379,8 +380,20 @@ export default function GovtVsPrivateClassifier({
             </div>
           </div>
 
-          {/* Action CTA */}
-          <div className="pt-6 border-t-2 border-black">
+          {/* Action CTAs */}
+          <div className="pt-6 border-t-2 border-black space-y-3">
+            <a
+              href={resolveDynamicDeepLink({
+                category: "TN_GOVT_PRIVATE_JOBS",
+                district: reg.district,
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-swiss-yellow w-full text-center inline-flex items-center justify-center gap-2 text-sm sm:text-base font-extrabold"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span>TN Govt Private Jobs Portal ({getTNPortalDistrictInfo(reg.district).liveVacancies} Vacancies) ↗</span>
+            </a>
             <a
               href={resolveDynamicDeepLink({
                 category: "NAPS_APPRENTICESHIP",

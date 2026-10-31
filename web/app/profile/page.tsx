@@ -35,7 +35,9 @@ export default function UserProfilePage() {
     setRawResumeText,
   } = useUserProfile();
 
-  // Local form state
+  const [mounted, setMounted] = useState(false);
+
+  // Local form state with defensive fallbacks
   const [name, setName] = useState(profile?.name || "Guest Learner");
   const [email, setEmail] = useState(profile?.email || "learner@tn.gov.in");
   const [district, setDistrict] = useState(profile?.district || "Krishnagiri");
@@ -45,6 +47,10 @@ export default function UserProfilePage() {
   const [resumeText, setResumeText] = useState(profile?.resumeSummary || "");
   const [skills, setSkills] = useState<string[]>(Array.isArray(profile?.extractedSkills) ? profile.extractedSkills : []);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Synchronize state when profile hydrates from localStorage
   useEffect(() => {
@@ -143,6 +149,17 @@ export default function UserProfilePage() {
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
   };
+
+  if (!mounted) {
+    return (
+      <div className="w-full min-h-screen bg-[#F4F4F1] py-12 px-4 sm:px-6 flex items-center justify-center font-mono font-extrabold text-base text-black">
+        <div className="p-8 bg-white border-2 border-black rounded-[24px] shadow-[4px_4px_0px_0px_#000000] flex items-center gap-3">
+          <Sparkles className="w-5 h-5 text-black animate-spin" />
+          <span>LOADING PROFILE INTAKE ENGINE...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-[#F4F4F1] py-8 sm:py-12 px-4 sm:px-6 lg:px-8 font-sans">

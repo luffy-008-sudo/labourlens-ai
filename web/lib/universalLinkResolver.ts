@@ -5,6 +5,8 @@
  * LinkedIn Jobs (Sanitized 1-2 word brand + simplified role), Indeed India, and Naukri.
  */
 
+import { buildTNPortalDistrictUrl } from './tnPrivateJobsData';
+
 export type LinkCategory =
   | 'SKILL_COURSE_GOVT'
   | 'SKILL_VIDEO_LECTURE'
@@ -15,13 +17,15 @@ export type LinkCategory =
   | 'PRIVATE_FACTORY_JOB'
   | 'INTERNSHIP_APPLY'
   | 'VERIFIED_SOURCE_EVIDENCE'
-  | 'SAFETY_LICENSE_PORTAL';
+  | 'SAFETY_LICENSE_PORTAL'
+  | 'TN_GOVT_PRIVATE_JOBS';
 
 export type JobPortalTarget =
   | 'google_jobs'
   | 'linkedin'
   | 'indeed'
   | 'naukri'
+  | 'tn_private_jobs'
   | 'career'
   | 'notification';
 
@@ -37,19 +41,16 @@ export interface DeepLinkParams {
   portal?: JobPortalTarget;
 }
 
-// Normalized trade mapping for direct DGT Bharat Skills CTS details
-const CTS_TRADE_URLS: Record<string, string> = {
-  fitter: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Fitter',
-  electrician: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Electrician',
-  welder: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Welder',
-  machinist: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Machinist',
-  turner: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Turner',
-  mechanic: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Mechanic_Diesel',
-  instrumentation: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Instrument_Mechanic',
-  electronics: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Electronic_Mechanic',
-  wireman: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Wireman',
-  foundry: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Foundryman',
-};
+// Direct course search engines for DGT Bharat Skills and SWAYAM that never bounce to root
+export function resolveGovtSkillCourseUrl(skill: string = '', sector: string = ''): string {
+  const query = skill.trim() || sector.trim() || 'Industrial Technology';
+  return `https://swayam.gov.in/explorer?searchText=${encodeURIComponent(query)}`;
+}
+
+export function resolveVideoLectureUrl(skill: string = '', sector: string = ''): string {
+  const query = skill.trim() || sector.trim() || 'Industrial Machine Training';
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(`DGT Bharat Skills NPTEL ${query} practical training workshop`)}`;
+}
 
 // District aliases for job search engines (e.g. Tuticorin for Thoothukudi, Hosur for Krishnagiri)
 const DISTRICT_ALIASES: Record<string, string> = {
@@ -60,6 +61,24 @@ const DISTRICT_ALIASES: Record<string, string> = {
   Chengalpattu: 'Chengalpattu Maraimalai Nagar',
   Tirunelveli: 'Gangaikondan Tirunelveli',
   Ranipet: 'Ranipet Walajapet',
+};
+
+// LinkedIn-specific recognizable city locations to prevent "No matching jobs found"
+const DISTRICT_LINKEDIN_LOCATION: Record<string, string> = {
+  Thoothukudi: 'Tuticorin, Tamil Nadu, India',
+  Krishnagiri: 'Hosur, Tamil Nadu, India',
+  Kancheepuram: 'Sriperumbudur, Tamil Nadu, India',
+  Chengalpattu: 'Chennai, Tamil Nadu, India',
+  Chennai: 'Chennai, Tamil Nadu, India',
+  Coimbatore: 'Coimbatore, Tamil Nadu, India',
+  Tiruchirappalli: 'Tiruchirappalli, Tamil Nadu, India',
+  Salem: 'Salem, Tamil Nadu, India',
+  Madurai: 'Madurai, Tamil Nadu, India',
+  Tiruppur: 'Tiruppur, Tamil Nadu, India',
+  Erode: 'Erode, Tamil Nadu, India',
+  Ranipet: 'Vellore, Tamil Nadu, India',
+  Vellore: 'Vellore, Tamil Nadu, India',
+  Cuddalore: 'Tamil Nadu, India',
 };
 
 // Strips parentheses, slashes, and buzzwords down to a 1-2 word core trade title that ALWAYS has live listings
@@ -114,22 +133,13 @@ export function resolveDynamicDeepLink(params: DeepLinkParams): string {
 
   switch (category) {
     case 'SKILL_COURSE_GOVT': {
-      // Check for exact DGT CTS trade match first
-      const lowerSkill = cleanSkill.toLowerCase();
-      for (const [trade, url] of Object.entries(CTS_TRADE_URLS)) {
-        if (lowerSkill.includes(trade)) {
-          return url;
-        }
-      }
-      // Opens exact skill curriculum/course on SWAYAM / Skill India Digital / Bharat Skills Search
-      const targetQuery = cleanSkill || cleanSector || 'Industrial Machine Operations';
-      return `https://swayam.gov.in/explorer?searchText=${encodeURIComponent(targetQuery)}`;
+      // Direct exact course / syllabus / module link on SWAYAM / Govt E-Learning
+      return resolveGovtSkillCourseUrl(cleanSkill, cleanSector);
     }
 
     case 'SKILL_VIDEO_LECTURE': {
       // Opens exact practical training videos from DGT Bharat Skills, NPTEL, and IIT workshops
-      const targetTopic = cleanSkill || cleanSector || 'Industrial Machine Maintenance';
-      return `https://www.youtube.com/results?search_query=${encodeURIComponent(`DGT Bharat Skills NPTEL ${targetTopic} practical training lecture`)}`;
+      return resolveVideoLectureUrl(cleanSkill, cleanSector);
     }
 
     case 'ITI_MAP_LOCATION': {
@@ -161,8 +171,9 @@ export function resolveDynamicDeepLink(params: DeepLinkParams): string {
       const queryTerm = sanitizedCompany ? `${sanitizedCompany} ${sanitizedRole}` : sanitizedRole;
 
       if (portal === 'linkedin') {
-        // Clean 1-2 word brand query strictly without parentheses or sentence clutter
-        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(sanitizedCompany || sanitizedRole)}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
+        // Clean 1-2 word brand query with LinkedIn-recognizable industrial city location
+        const linkedInLoc = DISTRICT_LINKEDIN_LOCATION[cleanDistrict] || 'Tamil Nadu, India';
+        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(sanitizedCompany || sanitizedRole)}&location=${encodeURIComponent(linkedInLoc)}`;
       }
       if (portal === 'indeed') {
         return `https://in.indeed.com/jobs?q=${encodeURIComponent(sanitizedCompany || sanitizedRole)}&l=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu`)}`;
@@ -171,11 +182,20 @@ export function resolveDynamicDeepLink(params: DeepLinkParams): string {
         const roleSlug = sanitizedRole.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         return `https://www.naukri.com/${encodeURIComponent(roleSlug)}-jobs-in-${encodeURIComponent(cleanDistrict.toLowerCase())}`;
       }
+      if (portal === 'tn_private_jobs') {
+        // Direct session filter on Tamil Nadu Private Jobs Portal
+        return buildTNPortalDistrictUrl(cleanDistrict);
+      }
       if (portal === 'career') {
         return `https://www.google.com/search?q=${encodeURIComponent(`${sanitizedCompany} careers plant jobs ${cleanDistrict} Tamil Nadu`)}`;
       }
       // Default: Google Jobs Aggregator which pulls LinkedIn + Naukri + Indeed + Company portal simultaneously
       return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${queryTerm} in ${districtSearch} Tamil Nadu`)}`;
+    }
+
+    case 'TN_GOVT_PRIVATE_JOBS': {
+      // Direct session filter on Tamil Nadu Private Jobs Portal (Department of Employment and Training)
+      return buildTNPortalDistrictUrl(cleanDistrict);
     }
 
     case 'INTERNSHIP_APPLY': {

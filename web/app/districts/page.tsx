@@ -27,6 +27,7 @@ import SwarmSyncBadge from "@/components/SwarmSyncBadge";
 import GovtVsPrivateClassifier from "@/components/GovtVsPrivateClassifier";
 import { useTranslation } from "@/lib/i18n";
 import { getDistrictRegistry, getDistrictDeepConclusion } from "@/lib/tnDistrictsRegistry";
+import { getTNPortalDistrictInfo } from "@/lib/tnPrivateJobsData";
 import { useUserProfile } from "@/lib/UserProfileContext";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -525,6 +526,19 @@ function DistrictDashboardContent() {
               <div className="pt-2 text-xs font-mono text-zinc-700 flex justify-between font-bold">
                 <span>LGD: {currentDistrict.lgd}</span>
                 <span>HQ: {currentDistrict.hq}</span>
+              </div>
+              <div className="mt-3 pt-3 border-t-2 border-zinc-100 flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-zinc-600 uppercase">TN DET Portal:</span>
+                <a
+                  href={`https://www.tnprivatejobs.tn.gov.in/Home/set_session_filter/city/${getTNPortalDistrictInfo(currentDistrict.name).id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 bg-[#F5C518] hover:bg-[#e6b814] text-black border border-black rounded-full font-mono text-xs font-extrabold shadow-[1px_1px_0px_0px_#000000] inline-flex items-center gap-1.5 hover:translate-x-0.5 transition-all"
+                  title="Official Department of Employment and Training Private Jobs Portal"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 animate-pulse" />
+                  <span>{getTNPortalDistrictInfo(currentDistrict.name).liveVacancies} Vacancies ↗</span>
+                </a>
               </div>
             </div>
 
