@@ -32,6 +32,10 @@ const DEFAULT_PROFILE: UserProfile = {
 
 interface UserProfileContextType {
   profile: UserProfile;
+  selectedDistrict: string;
+  setSelectedDistrict: (district: string) => void;
+  selectedDomain: string;
+  setSelectedDomain: (domain: string) => void;
   login: (name: string, email: string) => void;
   logout: () => void;
   updateProfile: (data: Partial<UserProfile>) => void;
@@ -63,6 +67,8 @@ export function sanitizeProfile(raw: any): UserProfile {
 
 export function UserProfileProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
+  const [selectedDistrict, setSelectedDistrictState] = useState<string>("Krishnagiri");
+  const [selectedDomain, setSelectedDomainState] = useState<string>("Chemical & Petrochemical");
 
   // Hydrate from localStorage on client mount with full schema sanitization
   useEffect(() => {
@@ -70,7 +76,9 @@ export function UserProfileProvider({ children }: { children: React.ReactNode })
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        setProfile(sanitizeProfile(parsed));
+        const clean = sanitizeProfile(parsed);
+        setProfile(clean);
+        if (clean.district) setSelectedDistrictState(clean.district);
       } else {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROFILE));
       }
@@ -79,6 +87,16 @@ export function UserProfileProvider({ children }: { children: React.ReactNode })
       setProfile(DEFAULT_PROFILE);
     }
   }, []);
+
+  const setSelectedDistrict = (dist: string) => {
+    setSelectedDistrictState(dist);
+    // Also update district in profile & storage
+    updateProfile({ district: dist });
+  };
+
+  const setSelectedDomain = (dom: string) => {
+    setSelectedDomainState(dom);
+  };
 
   const saveToStorage = (updated: UserProfile) => {
     const clean = sanitizeProfile(updated);
@@ -140,7 +158,19 @@ export function UserProfileProvider({ children }: { children: React.ReactNode })
   };
 
   return (
-    <UserProfileContext.Provider value={{ profile, login, logout, updateProfile, parseResume }}>
+    <UserProfileContext.Provider
+      value={{
+        profile,
+        selectedDistrict,
+        setSelectedDistrict,
+        selectedDomain,
+        setSelectedDomain,
+        login,
+        logout,
+        updateProfile,
+        parseResume,
+      }}
+    >
       {children}
     </UserProfileContext.Provider>
   );

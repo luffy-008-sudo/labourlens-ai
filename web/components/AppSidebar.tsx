@@ -2,37 +2,37 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   User,
   LogOut,
   LogIn,
-  MapPin,
   ChevronDown,
   ChevronRight,
   BarChart3,
   Compass,
-  ShieldCheck,
-  Activity,
   FileText,
   Search,
-  Sparkles,
-  ArrowUpRight,
   Layers,
 } from "lucide-react";
 import { useUserProfile } from "@/lib/UserProfileContext";
 import { useTranslation } from "@/lib/i18n";
+import { TN_38_DISTRICTS } from "@/lib/districtsData";
 
 export default function AppSidebar() {
-  const { profile, logout } = useUserProfile();
-  const { lang, t } = useTranslation();
+  const { profile, logout, setSelectedDistrict, setSelectedDomain, selectedDistrict, selectedDomain } = useUserProfile();
+  const { lang } = useTranslation();
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Search input state
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Collapsible groups in the left sidebar tree
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     districts: true,
     pathways: true,
-    user: true,
+    modules: true,
   });
 
   const toggleSection = (key: string) => {
@@ -54,6 +54,59 @@ export default function AppSidebar() {
     { slug: "renewable_energy", name: "Renewable Energy & Wind" },
   ];
 
+  // Dynamic search filtering
+  const filteredDistricts = searchQuery.trim()
+    ? Object.values(TN_38_DISTRICTS)
+        .filter((d) =>
+          d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          d.tamil.includes(searchQuery) ||
+          d.tag.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .slice(0, 8)
+        .map((d) => ({ name: d.name, lgd: d.lgd, tag: d.tag.split(",")[0] }))
+    : keyDistricts;
+
+  // District Quick-Link Click Handler
+  const handleDistrictClick = (districtName: string) => {
+    setSelectedDistrict(districtName);
+    if (pathname === "/routes") {
+      router.push(`/routes?district=${encodeURIComponent(districtName)}`);
+    } else {
+      router.push(`/district?district=${encodeURIComponent(districtName)}`);
+    }
+  };
+
+  // Domain Quick-Link Click Handler
+  const handleDomainClick = (domainName: string) => {
+    setSelectedDomain(domainName);
+    router.push(`/routes?sector=${encodeURIComponent(domainName)}`);
+  };
+
+  // Search Submit (Enter key)
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const query = searchQuery.trim();
+      if (!query) return;
+
+      const match = Object.values(TN_38_DISTRICTS).find(
+        (d) =>
+          d.name.toLowerCase().includes(query.toLowerCase()) ||
+          d.tamil.includes(query)
+      );
+
+      const targetDistrict = match ? match.name : query;
+      handleDistrictClick(targetDistrict);
+      setSearchQuery("");
+    }
+  };
+
+  // Sign out handler
+  const handleSignOut = () => {
+    logout();
+    router.push("/profile");
+  };
+
   return (
     <aside className="w-full lg:w-80 xl:w-96 flex-shrink-0 bg-white border-2 border-black rounded-[28px] p-6 shadow-[5px_5px_0px_0px_#000000] flex flex-col justify-between select-none space-y-6">
       <div className="space-y-6">
@@ -63,6 +116,9 @@ export default function AppSidebar() {
           <Search className="w-4 h-4 text-black absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
             placeholder={lang === "ta" ? "மாவட்டங்கள் தேடுக..." : "Search districts, trades..."}
             className="w-full pl-11 pr-4 py-3 text-sm font-mono bg-[#FAF9F5] border-2 border-black rounded-full focus:outline-none focus:bg-white placeholder:text-zinc-600 font-bold shadow-[2px_2px_0px_0px_#000000] transition-colors"
           />
@@ -112,9 +168,10 @@ export default function AppSidebar() {
               <span>{lang === "ta" ? "சுயவிவரம்" : "Edit Profile"}</span>
             </Link>
 
-            {profile.isLoggedIn ? (
+            {profile?.isLoggedIn ? (
               <button
-                onClick={logout}
+                type="button"
+                onClick={handleSignOut}
                 className="text-xs font-mono font-extrabold text-zinc-700 hover:text-red-600 flex items-center gap-1 transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -138,6 +195,7 @@ export default function AppSidebar() {
           {/* Group 1: District Intelligence */}
           <div className="space-y-2">
             <button
+              type="button"
               onClick={() => toggleSection("districts")}
               className="w-full flex items-center justify-between py-2.5 px-3.5 bg-[#FAF9F5] border-2 border-black rounded-xl text-black font-extrabold hover:bg-[#F5C518] transition-all uppercase text-xs sm:text-sm tracking-tight shadow-[2px_2px_0px_0px_#000000]"
             >
@@ -156,9 +214,9 @@ export default function AppSidebar() {
               <ul className="pl-3 pt-1 space-y-1.5 border-l-2 border-black ml-3">
                 <li>
                   <Link
-                    href="/districts"
+                    href="/district"
                     className={`block py-2 px-3 text-sm font-extrabold rounded-lg transition-all ${
-                      pathname === "/districts"
+                      pathname === "/district" || pathname === "/districts"
                         ? "bg-[#F5C518] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
                         : "text-zinc-800 hover:text-black hover:bg-[#FAF9F5]"
                     }`}
@@ -166,17 +224,25 @@ export default function AppSidebar() {
                     38 Districts Full Radar →
                   </Link>
                 </li>
-                {keyDistricts.map((d) => (
-                  <li key={d.lgd}>
-                    <Link
-                      href={`/districts?district=${d.name}`}
-                      className="flex items-center justify-between py-1.5 px-3 text-zinc-800 hover:text-black hover:bg-[#FAF9F5] rounded-lg transition-colors font-bold text-sm"
-                    >
-                      <span>{d.name}</span>
-                      <span className="text-xs font-mono text-zinc-600 font-extrabold">{d.tag}</span>
-                    </Link>
-                  </li>
-                ))}
+                {filteredDistricts.map((d) => {
+                  const isSelected = selectedDistrict?.toLowerCase() === d.name.toLowerCase();
+                  return (
+                    <li key={d.lgd}>
+                      <button
+                        type="button"
+                        onClick={() => handleDistrictClick(d.name)}
+                        className={`w-full flex items-center justify-between py-1.5 px-3 rounded-lg transition-colors font-bold text-sm text-left ${
+                          isSelected
+                            ? "bg-[#F5C518] text-black border border-black"
+                            : "text-zinc-800 hover:text-black hover:bg-[#FAF9F5]"
+                        }`}
+                      >
+                        <span className="truncate">{d.name}</span>
+                        <span className="text-xs font-mono text-zinc-600 font-extrabold shrink-0 ml-2">{d.tag}</span>
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
@@ -184,6 +250,7 @@ export default function AppSidebar() {
           {/* Group 2: Learner Career Pathways */}
           <div className="space-y-2">
             <button
+              type="button"
               onClick={() => toggleSection("pathways")}
               className="w-full flex items-center justify-between py-2.5 px-3.5 bg-[#FAF9F5] border-2 border-black rounded-xl text-black font-extrabold hover:bg-[#F5C518] transition-all uppercase text-xs sm:text-sm tracking-tight shadow-[2px_2px_0px_0px_#000000]"
             >
@@ -212,21 +279,29 @@ export default function AppSidebar() {
                     Personalized Roadmap Engine →
                   </Link>
                 </li>
-                {keyDomains.map((dom) => (
-                  <li key={dom.slug}>
-                    <Link
-                      href={`/routes?sector=${encodeURIComponent(dom.name)}`}
-                      className="block py-1.5 px-3 text-zinc-800 hover:text-black hover:bg-[#FAF9F5] rounded-lg transition-colors truncate font-bold text-sm"
-                    >
-                      {dom.name}
-                    </Link>
-                  </li>
-                ))}
+                {keyDomains.map((dom) => {
+                  const isDomainSelected = selectedDomain?.toLowerCase().includes(dom.slug) || selectedDomain === dom.name;
+                  return (
+                    <li key={dom.slug}>
+                      <button
+                        type="button"
+                        onClick={() => handleDomainClick(dom.name)}
+                        className={`w-full block py-1.5 px-3 rounded-lg transition-colors truncate font-bold text-sm text-left ${
+                          isDomainSelected && pathname === "/routes"
+                            ? "bg-[#F5C518] text-black border border-black"
+                            : "text-zinc-800 hover:text-black hover:bg-[#FAF9F5]"
+                        }`}
+                      >
+                        {dom.name}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
 
-          {/* Group 3: Core App Modules */}
+          {/* Group 3: Core App Modules (Strictly 4 Core Tabs Only) */}
           <div className="pt-2 border-t-2 border-black space-y-2">
             <Link
               href="/"
@@ -237,7 +312,31 @@ export default function AppSidebar() {
               }`}
             >
               <Layers className="w-4 h-4" />
-              <span>AI Agents Overview &amp; Hero</span>
+              <span>01 // OVERVIEW &amp; SWARM HERO</span>
+            </Link>
+
+            <Link
+              href="/district"
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-extrabold text-sm transition-all ${
+                pathname === "/district" || pathname === "/districts"
+                  ? "bg-[#F5C518] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
+                  : "text-black hover:bg-[#FAF9F5] border border-transparent hover:border-black"
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span>02 // DISTRICT INTELLIGENCE</span>
+            </Link>
+
+            <Link
+              href="/routes"
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-extrabold text-sm transition-all ${
+                pathname === "/routes"
+                  ? "bg-[#F5C518] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
+                  : "text-black hover:bg-[#FAF9F5] border border-transparent hover:border-black"
+              }`}
+            >
+              <Compass className="w-4 h-4" />
+              <span>03 // LEARNER ROADMAP</span>
             </Link>
 
             <Link
@@ -249,31 +348,7 @@ export default function AppSidebar() {
               }`}
             >
               <User className="w-4 h-4" />
-              <span>User Profile &amp; Resume</span>
-            </Link>
-
-            <Link
-              href="/admin"
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-extrabold text-sm transition-all ${
-                pathname === "/admin"
-                  ? "bg-[#F5C518] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
-                  : "text-black hover:bg-[#FAF9F5] border border-transparent hover:border-black"
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Review Queue &amp; Audit</span>
-            </Link>
-
-            <Link
-              href="/behind-the-data"
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-extrabold text-sm transition-all ${
-                pathname === "/behind-the-data"
-                  ? "bg-[#F5C518] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
-                  : "text-black hover:bg-[#FAF9F5] border border-transparent hover:border-black"
-              }`}
-            >
-              <Activity className="w-4 h-4" />
-              <span>Grounding Telemetry &amp; Sources</span>
+              <span>04 // PROFILE &amp; RESUME</span>
             </Link>
           </div>
 

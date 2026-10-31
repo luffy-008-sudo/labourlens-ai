@@ -39,14 +39,19 @@ export default function SwarmSyncBadge({ district = "Cuddalore" }: { district?: 
   const handleForceRefresh = useCallback(async (silent = false) => {
     if (!silent) setIsRefreshing(true);
     try {
-      await fetch(`/api/swarm?district=${encodeURIComponent(district)}&force=true`, {
+      // Ensure visible feedback with at least 600ms spinner animation
+      const minDelay = silent ? Promise.resolve() : new Promise((r) => setTimeout(r, 600));
+      const networkFetch = fetch(`/api/swarm?district=${encodeURIComponent(district)}&force=true`, {
         method: "POST",
-      });
+      }).catch(() => null);
+
+      await Promise.all([minDelay, networkFetch]);
+
       setLastSyncTime(new Date());
       setElapsedMinutes(0);
       if (!silent) {
         setJustRefreshed(true);
-        setTimeout(() => setJustRefreshed(false), 2500);
+        setTimeout(() => setJustRefreshed(false), 3000);
       }
     } catch {
       setLastSyncTime(new Date());

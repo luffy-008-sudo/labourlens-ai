@@ -90,8 +90,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="hover:text-black hover:underline flex items-center justify-between transition-colors group p-1">
-                  <span>04 // CONSTITUTIONAL REVIEW QUEUE</span>
+                <Link href="/" className="hover:text-black hover:underline flex items-center justify-between transition-colors group p-1">
+                  <span>04 // OVERVIEW &amp; SWARM TELEMETRY</span>
                   <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Link>
               </li>

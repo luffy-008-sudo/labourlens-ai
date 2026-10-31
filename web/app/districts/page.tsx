@@ -210,7 +210,7 @@ function SectorGalleryCard({
 /* ─── Main District Dashboard ─────────────────────────────────────────────── */
 function DistrictDashboardContent() {
   const { lang } = useTranslation();
-  const { profile } = useUserProfile();
+  const { profile, selectedDistrict } = useUserProfile();
   const searchParams = useSearchParams();
   const paramDistrict = searchParams.get("district");
 
@@ -219,21 +219,17 @@ function DistrictDashboardContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [cardsVisible, setCardsVisible] = useState(true);
 
-  // Sync district with URL query or profile
+  // Sync district with URL query, global context, or profile
   useEffect(() => {
-    if (paramDistrict) {
-      const found = Object.values(TN_38_DISTRICTS).find(
-        (d) => d.name.toLowerCase() === paramDistrict.toLowerCase().trim()
-      );
-      if (found) setDistrictLgd(found.lgd);
-    } else if (profile?.district) {
-      const target = (profile.district || "").toLowerCase().trim();
+    const activeName = paramDistrict || selectedDistrict || profile?.district;
+    if (activeName) {
+      const target = activeName.toLowerCase().trim();
       const found = Object.values(TN_38_DISTRICTS).find(
         (d) => d.name.toLowerCase() === target
       );
       if (found) setDistrictLgd(found.lgd);
     }
-  }, [paramDistrict, profile]);
+  }, [paramDistrict, selectedDistrict, profile]);
 
   // Sensitivity Sliders
   const [wSignal, setWSignal] = useState(0.40);

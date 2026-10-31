@@ -49,12 +49,6 @@ export default function Navbar() {
       tamilLabel: "சுயவிவரம்",
       icon: User,
     },
-    {
-      href: "/admin",
-      label: "Review Queue",
-      tamilLabel: "மதிப்பாய்வு",
-      icon: ShieldCheck,
-    },
   ];
 
   return (
@@ -87,7 +81,10 @@ export default function Navbar() {
           <nav className="hidden lg:flex items-center gap-2 font-sans">
             {navLinks.map((link) => {
               const Icon = link.icon;
-              const isActive = pathname === link.href;
+              const isActive =
+                link.href === "/districts"
+                  ? pathname === "/districts" || pathname === "/district"
+                  : pathname === link.href;
               return (
                 <Link
                   key={link.href}
@@ -190,7 +187,10 @@ export default function Navbar() {
 
             {navLinks.map((link) => {
               const Icon = link.icon;
-              const isActive = pathname === link.href;
+              const isActive =
+                link.href === "/districts"
+                  ? pathname === "/districts" || pathname === "/district"
+                  : pathname === link.href;
               return (
                 <Link
                   key={link.href}

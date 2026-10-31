@@ -204,7 +204,7 @@ function RoadmapStepper({ phases }: { phases: StepperPhase[] }) {
 
 function LearnerRoutesContent() {
   const { lang } = useTranslation();
-  const { profile } = useUserProfile();
+  const { profile, selectedDistrict: contextDistrict, selectedDomain: contextDomain } = useUserProfile();
   const searchParams = useSearchParams();
   const queryDistrict = searchParams.get("district");
   const querySector = searchParams.get("sector");
@@ -213,22 +213,22 @@ function LearnerRoutesContent() {
   const [selectedDomain, setSelectedDomain] = useState<string>("ev_automotive");
   const [selectedQual, setSelectedQual] = useState<string>("iti_polytechnic");
 
-  // Sync with searchParams or Profile
+  // Sync with searchParams, context, or Profile
   useEffect(() => {
-    if (queryDistrict) {
-      setSelectedDistrict(queryDistrict);
-    } else if (profile?.district) {
-      setSelectedDistrict(profile.district);
+    const activeDist = queryDistrict || contextDistrict || profile?.district;
+    if (activeDist) {
+      setSelectedDistrict(activeDist);
     }
 
-    if (querySector) {
-      setSelectedDomain(matchDomainFromSector(querySector));
+    const activeSector = querySector || contextDomain;
+    if (activeSector) {
+      setSelectedDomain(matchDomainFromSector(activeSector));
     }
 
     if (profile?.qualification) {
       setSelectedQual(profile.qualification);
     }
-  }, [queryDistrict, querySector, profile]);
+  }, [queryDistrict, querySector, contextDistrict, contextDomain, profile]);
 
   const roadmap = getPersonalizedRoadmap(selectedDistrict, selectedDomain, selectedQual);
   const districtObj = Object.values(TN_38_DISTRICTS).find(
