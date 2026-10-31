@@ -227,8 +227,9 @@ function DistrictDashboardContent() {
       );
       if (found) setDistrictLgd(found.lgd);
     } else if (profile?.district) {
+      const target = (profile.district || "").toLowerCase().trim();
       const found = Object.values(TN_38_DISTRICTS).find(
-        (d) => d.name.toLowerCase() === profile.district.toLowerCase().trim()
+        (d) => d.name.toLowerCase() === target
       );
       if (found) setDistrictLgd(found.lgd);
     }
