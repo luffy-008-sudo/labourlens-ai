@@ -1,6 +1,8 @@
 /**
  * Universal Dynamic Deep-Link Resolver Engine for Labourlens AI
  * Guarantees zero dead/generic root homepage redirects across all 38 Tamil Nadu districts.
+ * Supports multi-platform verification: Google Jobs (Aggregated across LinkedIn, Indeed & Naukri),
+ * LinkedIn Jobs, Indeed India, and Official Career Pages.
  */
 
 export type LinkCategory =
@@ -15,6 +17,13 @@ export type LinkCategory =
   | 'VERIFIED_SOURCE_EVIDENCE'
   | 'SAFETY_LICENSE_PORTAL';
 
+export type JobPortalTarget =
+  | 'google_jobs'
+  | 'linkedin'
+  | 'indeed'
+  | 'career'
+  | 'notification';
+
 export interface DeepLinkParams {
   category: LinkCategory;
   district: string;
@@ -24,6 +33,7 @@ export interface DeepLinkParams {
   roleTitle?: string;
   itiName?: string;
   sourceHeadline?: string;
+  portal?: JobPortalTarget;
 }
 
 // Normalized trade mapping for direct DGT Bharat Skills CTS details
@@ -40,6 +50,43 @@ const CTS_TRADE_URLS: Record<string, string> = {
   foundry: 'https://bharatskills.gov.in/Home/CTSdetails?trade=Foundryman',
 };
 
+// District aliases for job search engines (e.g. Tuticorin for Thoothukudi, Hosur for Krishnagiri)
+const DISTRICT_ALIASES: Record<string, string> = {
+  Thoothukudi: 'Thoothukudi Tuticorin',
+  Krishnagiri: 'Hosur Krishnagiri',
+  Tiruchirappalli: 'Trichy Tiruchirappalli',
+  Kancheepuram: 'Sriperumbudur Kancheepuram',
+  Chengalpattu: 'Chengalpattu Maraimalai Nagar',
+  Tirunelveli: 'Gangaikondan Tirunelveli',
+  Ranipet: 'Ranipet Walajapet',
+};
+
+/**
+ * Strips parentheses, acronym explanations, and corporate suffixes that break
+ * LinkedIn and Indeed query parsers (e.g. "SPIC (Southern Petrochemical...)" -> "SPIC")
+ */
+export function extractCleanBrandName(raw: string): string {
+  if (!raw) return '';
+  // Check if there is an uppercase acronym inside parentheses e.g. "Southern Petrochemical (SPIC)"
+  const parenMatch = raw.match(/\(([^)]+)\)/);
+  if (parenMatch && parenMatch[1]) {
+    const inside = parenMatch[1].trim();
+    if (inside.length <= 8 && inside === inside.toUpperCase()) {
+      return inside;
+    }
+  }
+
+  // Extract text before parentheses or slashes
+  let brand = raw.split('(')[0].split('/')[0].trim();
+
+  // Strip corporate clutter words that impede job matching
+  brand = brand
+    .replace(/\b(Private|Pvt|Limited|Ltd|Corporation|Enterprises|Campus|Complexes|Facilities|Station|Power Station)\b/gi, '')
+    .trim();
+
+  return brand || raw.replace(/[()]/g, ' ').trim();
+}
+
 export function resolveDynamicDeepLink(params: DeepLinkParams): string {
   const {
     category,
@@ -50,12 +97,16 @@ export function resolveDynamicDeepLink(params: DeepLinkParams): string {
     roleTitle = '',
     itiName = '',
     sourceHeadline = '',
+    portal = 'google_jobs',
   } = params;
 
-  const cleanDistrict = (district || 'Tamil Nadu').split('(')[0].trim();
+  const rawDistrict = (district || 'Tamil Nadu').split('(')[0].trim();
+  const cleanDistrict = rawDistrict;
+  const districtSearch = DISTRICT_ALIASES[cleanDistrict] || cleanDistrict;
   const cleanSector = (sector || '').split(',')[0].trim();
   const cleanSkill = (skillName || '').trim();
   const cleanCompany = (companyName || '').trim();
+  const cleanBrand = extractCleanBrandName(cleanCompany) || cleanCompany;
   const cleanRole = (roleTitle || '').trim();
 
   switch (category) {
@@ -90,29 +141,41 @@ export function resolveDynamicDeepLink(params: DeepLinkParams): string {
     }
 
     case 'GOVT_PSU_VACANCY': {
+      if (portal === 'notification') {
+        return `https://www.google.com/search?q=${encodeURIComponent(`${cleanBrand} recruitment notification apprentice technician ${cleanDistrict} Tamil Nadu apply online`)}`;
+      }
       // Opens live Google Jobs & Official Notification search filtered strictly to that PSU + District Recruitment
-      const targetEntity = cleanCompany || 'PSU Government';
-      const targetCadre = cleanRole || 'Technician Trainee Engineer';
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${targetEntity} ${targetCadre} jobs in ${cleanDistrict} Tamil Nadu`)}`;
+      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${cleanBrand} ${cleanRole || 'technician engineer'} jobs in ${districtSearch} Tamil Nadu`)}`;
     }
 
     case 'NAPS_APPRENTICESHIP': {
       // Opens live Apprenticeship & Trainee postings for that exact trade and district
       const targetCadre = cleanRole || cleanSector || 'Technician';
-      const targetFirm = cleanCompany ? `${cleanCompany} ` : '';
-      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`Apprentice ${targetCadre} ${targetFirm}in ${cleanDistrict} Tamil Nadu`)}`;
+      const targetFirm = cleanBrand ? `${cleanBrand} ` : '';
+      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`Apprentice ${targetCadre} ${targetFirm}in ${districtSearch} Tamil Nadu`)}`;
     }
 
     case 'PRIVATE_FACTORY_JOB': {
-      // Opens live LinkedIn Jobs pre-filtered to the exact Role + Company + District in Tamil Nadu
-      const keyword = `${cleanRole} ${cleanCompany || cleanSector}`.trim();
-      return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(keyword)}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
+      // Route by requested job portal
+      if (portal === 'linkedin') {
+        // Clean query strictly without parentheses so LinkedIn parser succeeds
+        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(cleanBrand)}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
+      }
+      if (portal === 'indeed') {
+        return `https://in.indeed.com/jobs?q=${encodeURIComponent(cleanBrand)}&l=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu`)}`;
+      }
+      if (portal === 'career') {
+        return `https://www.google.com/search?q=${encodeURIComponent(`${cleanBrand} careers plant jobs ${cleanDistrict} Tamil Nadu`)}`;
+      }
+      // Default: Google Jobs Aggregator which pulls LinkedIn + Indeed + Naukri + Company portal simultaneously
+      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${cleanBrand} jobs in ${districtSearch} Tamil Nadu`)}`;
     }
 
     case 'INTERNSHIP_APPLY': {
-      // Opens live Internship / In-Plant training openings in that exact district and domain
-      const keyword = `${cleanRole || cleanSector} Intern Trainee`.trim();
-      return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(keyword)}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
+      if (portal === 'linkedin') {
+        return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(`${cleanBrand || cleanSector} Intern Trainee`.trim())}&location=${encodeURIComponent(`${cleanDistrict}, Tamil Nadu, India`)}`;
+      }
+      return `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${cleanBrand || cleanSector} intern trainee apprenticeship in ${districtSearch} Tamil Nadu`)}`;
     }
 
     case 'SAFETY_LICENSE_PORTAL': {
@@ -123,14 +186,13 @@ export function resolveDynamicDeepLink(params: DeepLinkParams): string {
 
     case 'VERIFIED_SOURCE_EVIDENCE': {
       // Opens the exact verified government gazette / industrial news evidence for that district claim
-      const headline = sourceHeadline || cleanCompany || 'SIPCOT Industrial Investment';
+      const headline = sourceHeadline || cleanBrand || 'SIPCOT Industrial Investment';
       return `https://www.google.com/search?q=${encodeURIComponent(`${headline} ${cleanDistrict} ${cleanSector} SIPCOT Tamil Nadu`)}`;
     }
 
     default:
-      return `https://www.google.com/search?q=${encodeURIComponent(`${cleanSkill || cleanCompany || cleanRole || cleanSector} ${cleanDistrict} Tamil Nadu`)}`;
+      return `https://www.google.com/search?q=${encodeURIComponent(`${cleanSkill || cleanBrand || cleanRole || cleanSector} ${cleanDistrict} Tamil Nadu`)}`;
   }
 }
 
 export default resolveDynamicDeepLink;
-

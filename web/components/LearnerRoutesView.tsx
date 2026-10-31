@@ -930,19 +930,37 @@ function LearnerRoutesContent() {
                           <span className="text-black font-extrabold">■</span>
                           <span className="font-extrabold text-black">{emp}</span>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
                           <a
                             href={resolveDynamicDeepLink({
                               category: "GOVT_PSU_VACANCY",
                               district: selectedDistrict,
                               companyName: emp,
                               roleTitle: roadmap.qualification.startingCadre,
+                              portal: "notification",
                             })}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-white hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
+                            title="Search official recruitment gazettes and notices"
                           >
-                            <span>Live Vacancies</span>
+                            <span>Notification</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                          <a
+                            href={resolveDynamicDeepLink({
+                              category: "GOVT_PSU_VACANCY",
+                              district: selectedDistrict,
+                              companyName: emp,
+                              roleTitle: roadmap.qualification.startingCadre,
+                              portal: "google_jobs",
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-[#F5C518] hover:bg-[#e6b814] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
+                            title="View aggregated postings across all boards"
+                          >
+                            <span>Google Jobs</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
@@ -969,19 +987,53 @@ function LearnerRoutesContent() {
                           <span className="text-black font-extrabold">■</span>
                           <span className="font-extrabold text-black">{emp}</span>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
                           <a
                             href={resolveDynamicDeepLink({
                               category: "PRIVATE_FACTORY_JOB",
                               district: selectedDistrict,
                               companyName: emp,
                               roleTitle: roadmap.qualification.startingCadre,
+                              portal: "google_jobs",
                             })}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-white hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
+                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-[#F5C518] hover:bg-[#e6b814] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
+                            title="Aggregated across LinkedIn, Indeed, Naukri & company pages"
                           >
-                            <span>Plant Jobs</span>
+                            <span>Google Jobs</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                          <a
+                            href={resolveDynamicDeepLink({
+                              category: "PRIVATE_FACTORY_JOB",
+                              district: selectedDistrict,
+                              companyName: emp,
+                              roleTitle: roadmap.qualification.startingCadre,
+                              portal: "linkedin",
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] font-mono font-extrabold px-2 py-1 bg-white hover:bg-[#FAF9F5] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
+                            title="Direct clean search on LinkedIn"
+                          >
+                            <span>LinkedIn</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                          <a
+                            href={resolveDynamicDeepLink({
+                              category: "PRIVATE_FACTORY_JOB",
+                              district: selectedDistrict,
+                              companyName: emp,
+                              roleTitle: roadmap.qualification.startingCadre,
+                              portal: "indeed",
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] font-mono font-extrabold px-2 py-1 bg-white hover:bg-[#FAF9F5] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
+                            title="Direct plant technician search on Indeed India"
+                          >
+                            <span>Indeed</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
