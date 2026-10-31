@@ -1,4 +1,5 @@
-# KaushalSetu — Master Build Prompt
+# labourlens ai
+— Master Build Prompt
 
 > **For the coding agent:** this is the complete specification for KaushalSetu. Read all of it before writing code. Build in the milestone order in §15. Work through each milestone's acceptance criteria before you move to the next one. Wherever this spec says *verify*, check the live endpoint or page yourself. Never assume an endpoint or dataset exists because it is written here.
 
