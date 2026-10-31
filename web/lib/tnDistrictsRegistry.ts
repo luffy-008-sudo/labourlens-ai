@@ -11,6 +11,8 @@
  * 7. Actionable 4-Stage Zero-to-Job Employee Roadmap
  */
 
+import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
+
 export interface DistrictRegistryEntry {
   district: string;
   tamilName: string;
@@ -1087,7 +1089,11 @@ export function getDistrictRegistry(districtName: string): DistrictRegistryEntry
         "DGT National Trade Test (NTC Merit Allotment)",
         "TANGEDCO / State PSU Direct Recruitment Exam",
       ],
-      portalUrl: "https://www.tnpsc.gov.in",
+      portalUrl: resolveDynamicDeepLink({
+        category: "GOVT_PSU_VACANCY",
+        district: d,
+        roleTitle: "Technician Trainee",
+      }),
     },
     privateTrack: {
       employers: [
@@ -1114,7 +1120,11 @@ export function getDistrictRegistry(districtName: string): DistrictRegistryEntry
         "Direct Walk-in at Factory HR Gates",
         "Campus Drive via District Govt ITI",
       ],
-      portalUrl: "https://apprenticeshipindia.gov.in",
+      portalUrl: resolveDynamicDeepLink({
+        category: "NAPS_APPRENTICESHIP",
+        district: d,
+        roleTitle: "Shopfloor Machine Setter",
+      }),
     },
   };
 }

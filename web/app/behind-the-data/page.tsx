@@ -24,6 +24,7 @@ import {
 import SpecificationTag from "@/components/SpecificationTag";
 import { TN_38_DISTRICTS } from "@/lib/districtsData";
 import { useTranslation } from "@/lib/i18n";
+import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
 
 interface AgentStep {
   id: string;
@@ -419,7 +420,11 @@ export default function BehindTheDataPage() {
                       </div>
                       <div className="mt-2 text-right">
                         <a
-                          href={art.url}
+                          href={art.url && art.url !== "#" ? art.url : resolveDynamicDeepLink({
+                            category: "VERIFIED_SOURCE_EVIDENCE",
+                            district: "Tamil Nadu",
+                            sourceHeadline: art.title,
+                          })}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-[#6E2620] hover:underline"

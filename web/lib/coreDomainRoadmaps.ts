@@ -6,6 +6,7 @@
  */
 
 import { getDistrictRegistry, DistrictRegistryEntry } from "./tnDistrictsRegistry";
+import { resolveDynamicDeepLink } from "./universalLinkResolver";
 
 export const DISTRICT_TO_PRIMARY_DOMAIN: Record<string, string> = {
   Krishnagiri: "ev_automotive",
@@ -751,7 +752,18 @@ export function getPersonalizedRoadmap(
       {
         stage: "Stage 1 (Months 1–2): Foundation & Core Theory",
         objective: qual.customActionMonths1_2,
-        recommendedCourses: domain.foundationCourses,
+        recommendedCourses: domain.foundationCourses.map((c) => ({
+          ...c,
+          url: resolveDynamicDeepLink({
+            category:
+              c.platform.toLowerCase().includes("video") || c.platform.toLowerCase().includes("nptel")
+                ? "SKILL_VIDEO_LECTURE"
+                : "SKILL_COURSE_GOVT",
+            district: districtReg.district,
+            sector: domain.name,
+            skillName: c.title,
+          }),
+        })),
         milestone: "100% Free Government Verified Online Certification",
       },
       {
@@ -767,12 +779,22 @@ export function getPersonalizedRoadmap(
         apprenticeshipPortals: [
           {
             name: "NAPS (National Apprenticeship Promotion Scheme)",
-            url: "https://www.apprenticeshipindia.gov.in",
+            url: resolveDynamicDeepLink({
+              category: "NAPS_APPRENTICESHIP",
+              district: districtReg.district,
+              sector: domain.name,
+              roleTitle: qual.label,
+            }),
             purpose: "For 10th/12th and ITI/Diploma candidates for paid factory training.",
           },
           {
             name: "NATS 2.0 (National Apprenticeship Training Scheme)",
-            url: "https://nats.education.gov.in",
+            url: resolveDynamicDeepLink({
+              category: "INTERNSHIP_APPLY",
+              district: districtReg.district,
+              sector: domain.name,
+              roleTitle: `${qual.label} Graduate Trainee`,
+            }),
             purpose: "For Diploma and B.E./B.Tech graduates for Graduate Apprentice Trainee roles.",
           },
         ],

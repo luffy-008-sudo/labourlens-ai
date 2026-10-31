@@ -35,6 +35,7 @@ import {
   getPersonalizedRoadmap,
   getPrimaryDomainForDistrict,
 } from "@/lib/coreDomainRoadmaps";
+import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
 
 function matchDomainFromSector(sectorQuery: string | null): string {
   if (!sectorQuery) return "chemical";
@@ -339,7 +340,12 @@ function LearnerRoutesContent() {
                 <p className="text-sm font-sans text-zinc-700 font-medium">{crs.topics}</p>
                 <div className="pt-3 border-t-2 border-zinc-100">
                   <a
-                    href="https://bharatskills.gov.in"
+                    href={resolveDynamicDeepLink({
+                      category: "SKILL_COURSE_GOVT",
+                      district: selectedDistrict,
+                      sector: roadmap.domain.name,
+                      skillName: crs.title,
+                    })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-swiss-yellow w-full text-center inline-flex items-center justify-center gap-2 text-xs py-2"
@@ -382,6 +388,20 @@ function LearnerRoutesContent() {
                     ))}
                   </div>
                 </div>
+                <div className="pt-2 border-t-2 border-zinc-100 flex justify-end">
+                  <a
+                    href={resolveDynamicDeepLink({
+                      category: "ITI_MAP_LOCATION",
+                      district: selectedDistrict,
+                      itiName: iti.name,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono font-extrabold text-black hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>📍 Locate on Maps ↗</span>
+                  </a>
+                </div>
               </div>
             ))}
           </div>
@@ -407,6 +427,20 @@ function LearnerRoutesContent() {
                 </div>
                 <span className="text-xs font-mono text-zinc-600 block font-bold">AUTHORITY: {tkt.issuingAuthority}</span>
                 <p className="text-sm text-zinc-800 font-sans leading-relaxed font-medium">{tkt.whyRequired}</p>
+                <div className="pt-2 border-t-2 border-zinc-100 flex justify-end">
+                  <a
+                    href={resolveDynamicDeepLink({
+                      category: "SAFETY_LICENSE_PORTAL",
+                      district: selectedDistrict,
+                      skillName: tkt.name,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono font-extrabold text-black hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>Statutory License &amp; Exam Norms ↗</span>
+                  </a>
+                </div>
               </div>
             ))}
           </div>
@@ -658,33 +692,43 @@ function LearnerRoutesContent() {
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <a
-                      href="https://bharatskills.gov.in"
+                      href={resolveDynamicDeepLink({
+                        category: "SKILL_COURSE_GOVT",
+                        district: selectedDistrict,
+                        sector: roadmap.domain.name,
+                        skillName: activeModalSkill || "Machine Tool Operations",
+                      })}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-3 bg-white border-2 border-black rounded-xl hover:bg-[#FAF9F5] shadow-[2px_2px_0px_0px_#000000] flex items-center justify-between group"
                     >
                       <div>
                         <span className="text-[11px] font-mono font-extrabold bg-[#F5C518] px-1.5 py-0.5 rounded border border-black block w-fit mb-1">
-                          DGT BHARAT SKILLS
+                          DGT / SWAYAM CURRICULUM
                         </span>
-                        <span className="font-bold text-xs text-black block">CTS Trade E-Learning</span>
-                        <span className="text-[10px] text-zinc-600 font-mono">100% Free · DGT Certified</span>
+                        <span className="font-bold text-xs text-black block">Direct Skill Modules</span>
+                        <span className="text-[10px] text-zinc-600 font-mono">100% Free · DGT / NSQF Verified</span>
                       </div>
                       <ExternalLink className="w-4 h-4 text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </a>
 
                     <a
-                      href="https://nptel.ac.in"
+                      href={resolveDynamicDeepLink({
+                        category: "SKILL_VIDEO_LECTURE",
+                        district: selectedDistrict,
+                        sector: roadmap.domain.name,
+                        skillName: activeModalSkill || "Factory Workshop Operations",
+                      })}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-3 bg-white border-2 border-black rounded-xl hover:bg-[#FAF9F5] shadow-[2px_2px_0px_0px_#000000] flex items-center justify-between group"
                     >
                       <div>
                         <span className="text-[11px] font-mono font-extrabold bg-[#F5C518] px-1.5 py-0.5 rounded border border-black block w-fit mb-1">
-                          NPTEL / IIT MADRAS
+                          NPTEL &amp; DGT LECTURES
                         </span>
-                        <span className="font-bold text-xs text-black block">Process Engineering Tech</span>
-                        <span className="text-[10px] text-zinc-600 font-mono">100% Free · Ministry of Edu</span>
+                        <span className="font-bold text-xs text-black block">Practical Video Tutorials</span>
+                        <span className="text-[10px] text-zinc-600 font-mono">100% Free · Workshop Demos</span>
                       </div>
                       <ExternalLink className="w-4 h-4 text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </a>
@@ -827,25 +871,40 @@ function LearnerRoutesContent() {
 
               <div className="flex flex-wrap gap-2.5 shrink-0">
                 <a
-                  href="https://www.apprenticeshipindia.gov.in/apprenticeship/opportunity"
+                  href={resolveDynamicDeepLink({
+                    category: "NAPS_APPRENTICESHIP",
+                    district: selectedDistrict,
+                    sector: roadmap.domain.name,
+                    roleTitle: roadmap.qualification.startingCadre,
+                  })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-1.5"
                 >
-                  <span>NAPS Portal ↗</span>
+                  <span>NAPS Openings ↗</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
                 <a
-                  href="https://www.ncs.gov.in/job-seeker/pages/search.aspx"
+                  href={resolveDynamicDeepLink({
+                    category: "GOVT_PSU_VACANCY",
+                    district: selectedDistrict,
+                    sector: roadmap.domain.name,
+                    roleTitle: roadmap.qualification.startingCadre,
+                  })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-1.5"
                 >
-                  <span>NCS Portal ↗</span>
+                  <span>NCS Vacancies ↗</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
                 <a
-                  href="https://www.tnskill.tn.gov.in/"
+                  href={resolveDynamicDeepLink({
+                    category: "SAFETY_LICENSE_PORTAL",
+                    district: selectedDistrict,
+                    sector: roadmap.domain.name,
+                    skillName: "TNSDC Naan Mudhalvan skill certification",
+                  })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-2 bg-white hover:bg-[#F5C518] text-black border-2 border-black rounded-full font-mono text-xs font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-1.5"
@@ -873,12 +932,17 @@ function LearnerRoutesContent() {
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <a
-                            href={`https://www.google.com/search?q=${encodeURIComponent(emp + " " + selectedDistrict + " recruitment notification")}`}
+                            href={resolveDynamicDeepLink({
+                              category: "GOVT_PSU_VACANCY",
+                              district: selectedDistrict,
+                              companyName: emp,
+                              roleTitle: roadmap.qualification.startingCadre,
+                            })}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-white hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1"
+                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-white hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
                           >
-                            <span>Notification</span>
+                            <span>Live Vacancies</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
@@ -907,12 +971,17 @@ function LearnerRoutesContent() {
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <a
-                            href={`https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(emp + " " + selectedDistrict)}`}
+                            href={resolveDynamicDeepLink({
+                              category: "PRIVATE_FACTORY_JOB",
+                              district: selectedDistrict,
+                              companyName: emp,
+                              roleTitle: roadmap.qualification.startingCadre,
+                            })}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-white hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1"
+                            className="text-[11px] font-mono font-extrabold px-2.5 py-1 bg-white hover:bg-[#F5C518] text-black border border-black rounded-lg inline-flex items-center gap-1 shadow-[1px_1px_0px_0px_#000000]"
                           >
-                            <span>Jobs</span>
+                            <span>Plant Jobs</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
@@ -1011,7 +1080,11 @@ function LearnerRoutesContent() {
                         )}
                       </div>
                       <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(iti.name + " " + selectedDistrict + " Tamil Nadu")}`}
+                        href={resolveDynamicDeepLink({
+                          category: "ITI_MAP_LOCATION",
+                          district: selectedDistrict,
+                          itiName: iti.name,
+                        })}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs font-mono font-extrabold text-black hover:underline inline-flex items-center gap-1 pt-1"

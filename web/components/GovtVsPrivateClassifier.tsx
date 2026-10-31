@@ -17,6 +17,7 @@ import {
 import { getDistrictRegistry, DistrictRegistryEntry } from "@/lib/tnDistrictsRegistry";
 import { TN_38_DISTRICTS } from "@/lib/districtsData";
 import { useTranslation } from "@/lib/i18n";
+import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
 
 interface GovtVsPrivateClassifierProps {
   initialDistrict?: string;
@@ -280,7 +281,12 @@ export default function GovtVsPrivateClassifier({
           {/* Action CTA */}
           <div className="pt-6 border-t-2 border-black">
             <a
-              href={govt.portalUrl}
+              href={resolveDynamicDeepLink({
+                category: "GOVT_PSU_VACANCY",
+                district: reg.district,
+                companyName: govt.employers[0],
+                roleTitle: govt.roles[qualification],
+              })}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-swiss-yellow w-full text-center inline-flex items-center justify-center gap-2 text-sm sm:text-base"
@@ -376,7 +382,12 @@ export default function GovtVsPrivateClassifier({
           {/* Action CTA */}
           <div className="pt-6 border-t-2 border-black">
             <a
-              href="https://apprenticeshipindia.gov.in"
+              href={resolveDynamicDeepLink({
+                category: "NAPS_APPRENTICESHIP",
+                district: reg.district,
+                companyName: priv.employers[0],
+                roleTitle: priv.roles[qualification],
+              })}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-swiss-white w-full text-center inline-flex items-center justify-center gap-2 text-sm sm:text-base"

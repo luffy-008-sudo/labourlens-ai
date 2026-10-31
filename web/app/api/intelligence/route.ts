@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { TN_DISTRICTS_REGISTRY, getDistrictRegistry, getDistrictDeepConclusion } from "@/lib/tnDistrictsRegistry";
 import { CORE_DOMAINS, QUALIFICATION_PATHWAYS, getPrimaryDomainForDistrict } from "@/lib/coreDomainRoadmaps";
 import { TN_38_DISTRICTS } from "@/lib/districtsData";
+import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
 
 // In-memory cache & timestamp
 let lastSyncedAt = new Date();
@@ -76,7 +77,12 @@ async function handleIntelligence(request: Request) {
       location: `${district}, Tamil Nadu`,
       badge: "STATUTORY GOVT APPRENTICESHIP",
       verifiedSources: "NAPS / Gazette Allotment",
-      applyUrl: "https://www.apprenticeshipindia.gov.in/apprenticeship/opportunity",
+      applyUrl: resolveDynamicDeepLink({
+        category: "NAPS_APPRENTICESHIP",
+        district,
+        companyName: reg.govtPsuEmployers[0],
+        roleTitle: roleTitlePublic,
+      }),
     },
     {
       id: "INT-PSU-02",
@@ -87,7 +93,12 @@ async function handleIntelligence(request: Request) {
       location: `${district}, Tamil Nadu`,
       badge: "IDA WAGE GRID",
       verifiedSources: "Public Enterprise Portal",
-      applyUrl: "https://www.ncs.gov.in/",
+      applyUrl: resolveDynamicDeepLink({
+        category: "GOVT_PSU_VACANCY",
+        district,
+        companyName: reg.govtPsuEmployers[1],
+        roleTitle: roleTitlePublic,
+      }),
     },
     {
       id: "INT-PVT-01",
@@ -98,7 +109,12 @@ async function handleIntelligence(request: Request) {
       location: `${district} SIPCOT / SIDCO Zone`,
       badge: "DIRECT PLANT ABSORPTION",
       verifiedSources: "Active Factory JD Crawler",
-      applyUrl: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(domainProfile.name)}&location=${encodeURIComponent(district + ", Tamil Nadu, India")}`,
+      applyUrl: resolveDynamicDeepLink({
+        category: "PRIVATE_FACTORY_JOB",
+        district,
+        companyName: reg.privateEmployers[0],
+        roleTitle: roleTitlePrivate,
+      }),
     },
     {
       id: "INT-PVT-02",
@@ -109,7 +125,12 @@ async function handleIntelligence(request: Request) {
       location: `${district}, Tamil Nadu`,
       badge: "OVERTIME + ESI/PF BENEFITS",
       verifiedSources: "TNSDC Placement Board",
-      applyUrl: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(domainProfile.name)}&location=${encodeURIComponent(district + ", Tamil Nadu, India")}`,
+      applyUrl: resolveDynamicDeepLink({
+        category: "INTERNSHIP_APPLY",
+        district,
+        companyName: reg.privateEmployers[1],
+        roleTitle: roleTitlePrivate,
+      }),
     },
   ];
 
@@ -117,22 +138,37 @@ async function handleIntelligence(request: Request) {
   const targetedCourses = [
     {
       title: `${domainProfile.name.split(",")[0]} Fundamentals`,
-      platform: "DGT BHARAT SKILLS",
-      url: "https://bharatskills.gov.in",
+      platform: "DGT BHARAT SKILLS / SWAYAM",
+      url: resolveDynamicDeepLink({
+        category: "SKILL_COURSE_GOVT",
+        district,
+        sector: domainProfile.name,
+        skillName: `${domainProfile.name.split(",")[0]} Fundamentals`,
+      }),
       free: true,
-      description: "Official DGT CTS e-learning module with trade diagrams and workplace safety tests.",
+      description: "Official DGT CTS / SWAYAM e-learning module with trade diagrams and workplace safety tests.",
     },
     {
       title: "Advanced Industrial Automation & Process Control",
       platform: "NPTEL / IIT MADRAS",
-      url: "https://nptel.ac.in/courses",
+      url: resolveDynamicDeepLink({
+        category: "SKILL_VIDEO_LECTURE",
+        district,
+        sector: domainProfile.name,
+        skillName: "Industrial Automation & Process Control",
+      }),
       free: true,
       description: "State-funded video lecture series covering PLC logic, sensors, and plant instrumentation.",
     },
     {
       title: "Industrial Safety & Factory Shopfloor Compliance",
       platform: "SKILL INDIA DIGITAL",
-      url: "https://www.skillindiadigital.gov.in",
+      url: resolveDynamicDeepLink({
+        category: "SAFETY_LICENSE_PORTAL",
+        district,
+        sector: domainProfile.name,
+        skillName: "Industrial Safety DISH Factory Shopfloor Compliance",
+      }),
       free: true,
       description: "Mandatory DISH & OSHA 5S certification for core factory floor entry clearance.",
     },
@@ -201,3 +237,4 @@ async function handleIntelligence(request: Request) {
     },
   });
 }
+

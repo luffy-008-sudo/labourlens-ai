@@ -19,6 +19,7 @@ import {
 import SpecificationTag from "@/components/SpecificationTag";
 import { TN_38_DISTRICTS } from "@/lib/districtsData";
 import { useTranslation } from "@/lib/i18n";
+import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
 
 interface ReviewQueueItem {
   id: number;
@@ -243,7 +244,12 @@ export default function AdminPage() {
                   </p>
                   <div className="mt-2 text-right">
                     <a
-                      href={item.payload.source_url}
+                      href={item.payload.source_url && item.payload.source_url !== "#" ? item.payload.source_url : resolveDynamicDeepLink({
+                        category: "VERIFIED_SOURCE_EVIDENCE",
+                        district: item.payload.district_lgd || "Tamil Nadu",
+                        companyName: item.payload.firm,
+                        sourceHeadline: item.payload.evidence_quote,
+                      })}
                       target="_blank"
                       rel="noreferrer"
                       className="text-[#6E2620] font-bold hover:underline inline-flex items-center gap-1 text-[11px]"

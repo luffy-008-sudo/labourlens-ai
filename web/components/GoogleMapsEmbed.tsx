@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { MapPin, Navigation, ExternalLink, Layers, Compass, Building, GraduationCap } from "lucide-react";
+import { resolveDynamicDeepLink } from "@/lib/universalLinkResolver";
 
 interface GoogleMapsEmbedProps {
   districtName: string;
@@ -21,9 +22,11 @@ export default function GoogleMapsEmbed({
   const [mapType, setMapType] = useState<"roadmap" | "satellite">("roadmap");
   const [activeFilter, setActiveFilter] = useState<"all" | "park" | "iti" | "factory">("all");
 
-  const query = encodeURIComponent(`${districtName} industrial park SIPCOT ITI Tamil Nadu`);
   const mapsUrl = `https://www.google.com/maps?q=${lat},${lon}&z=${zoom}&output=embed&t=${mapType === "satellite" ? "k" : "m"}`;
-  const directMapsLink = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  const directMapsLink = resolveDynamicDeepLink({
+    category: "SIPCOT_PARK_MAP",
+    district: districtName,
+  });
 
   // Default key industrial points for the district
   const defaultPOIs = [
