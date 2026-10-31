@@ -108,7 +108,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 sm:gap-3">
             {/* 10-Minute Background Cron Header Badge */}
             <div className="hidden xl:block">
-              <SwarmSyncBadge district={profile.district} />
+              <SwarmSyncBadge district={profile?.district || "Krishnagiri"} />
             </div>
 
             {/* User Profile Pill */}
@@ -117,10 +117,10 @@ export default function Navbar() {
               className="hidden sm:flex items-center gap-2 px-3.5 py-2 bg-white border-2 border-black rounded-full text-sm font-mono font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:bg-[#F5C518] transition-colors"
             >
               <div className="w-6 h-6 rounded-full bg-black text-[#F5C518] font-extrabold text-xs flex items-center justify-center">
-                {profile.name.charAt(0).toUpperCase()}
+                {(profile?.name || "Guest").charAt(0).toUpperCase()}
               </div>
               <span className="truncate max-w-[120px] text-black">
-                {profile.name}
+                {profile?.name || "Guest Learner"}
               </span>
             </Link>
 
@@ -172,11 +172,11 @@ export default function Navbar() {
             <div className="p-3 mb-2 bg-white border-2 border-black rounded-2xl flex items-center justify-between text-xs font-mono shadow-[2px_2px_0px_0px_#000000]">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full bg-black text-[#F5C518] font-bold text-xs flex items-center justify-center">
-                  {profile.name.charAt(0).toUpperCase()}
+                  {(profile?.name || "Guest").charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <div className="font-bold text-black">{profile.name}</div>
-                  <div className="text-[10px] text-zinc-600 font-mono">{profile.district}</div>
+                  <div className="font-bold text-black">{profile?.name || "Guest Learner"}</div>
+                  <div className="text-[10px] text-zinc-600 font-mono">{profile?.district || "Krishnagiri"}</div>
                 </div>
               </div>
               <Link

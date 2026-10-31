@@ -42,28 +42,49 @@ const UserProfileContext = createContext<UserProfileContextType | undefined>(und
 
 const STORAGE_KEY = "labourlens_user_profile";
 
+export function sanitizeProfile(raw: any): UserProfile {
+  if (!raw || typeof raw !== "object") return DEFAULT_PROFILE;
+  return {
+    name: typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : DEFAULT_PROFILE.name,
+    email: typeof raw.email === "string" && raw.email.trim() ? raw.email.trim() : DEFAULT_PROFILE.email,
+    userId: typeof raw.userId === "string" && raw.userId.trim() ? raw.userId.trim() : DEFAULT_PROFILE.userId,
+    isLoggedIn: typeof raw.isLoggedIn === "boolean" ? raw.isLoggedIn : DEFAULT_PROFILE.isLoggedIn,
+    district: typeof raw.district === "string" && raw.district.trim() ? raw.district.trim() : DEFAULT_PROFILE.district,
+    qualification: typeof raw.qualification === "string" && raw.qualification.trim() ? raw.qualification.trim() : DEFAULT_PROFILE.qualification,
+    branch: typeof raw.branch === "string" && raw.branch.trim() ? raw.branch.trim() : DEFAULT_PROFILE.branch,
+    careerTrack: raw.careerTrack === "govt" || raw.careerTrack === "private" || raw.careerTrack === "both" ? raw.careerTrack : DEFAULT_PROFILE.careerTrack,
+    resumeSummary: typeof raw.resumeSummary === "string" ? raw.resumeSummary : DEFAULT_PROFILE.resumeSummary,
+    extractedSkills: Array.isArray(raw.extractedSkills) && raw.extractedSkills.length > 0
+      ? raw.extractedSkills.filter((s: any) => typeof s === "string" && s.trim())
+      : DEFAULT_PROFILE.extractedSkills,
+    registeredDate: typeof raw.registeredDate === "string" ? raw.registeredDate : DEFAULT_PROFILE.registeredDate,
+  };
+}
+
 export function UserProfileProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
 
-  // Hydrate from localStorage on client mount
+  // Hydrate from localStorage on client mount with full schema sanitization
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        setProfile((prev) => ({ ...prev, ...parsed }));
+        setProfile(sanitizeProfile(parsed));
       } else {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROFILE));
       }
     } catch (e) {
       console.warn("Could not access localStorage for user profile:", e);
+      setProfile(DEFAULT_PROFILE);
     }
   }, []);
 
   const saveToStorage = (updated: UserProfile) => {
-    setProfile(updated);
+    const clean = sanitizeProfile(updated);
+    setProfile(clean);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
     } catch (e) {
       console.warn("Failed saving profile to localStorage:", e);
     }

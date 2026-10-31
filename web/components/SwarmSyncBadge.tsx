@@ -4,10 +4,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Zap, RefreshCw, CheckCircle2 } from "lucide-react";
 
 export default function SwarmSyncBadge({ district = "Cuddalore" }: { district?: string }) {
+  const [mounted, setMounted] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date>(() => new Date(Date.now() - 3 * 60 * 1000));
   const [elapsedMinutes, setElapsedMinutes] = useState(3);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [justRefreshed, setJustRefreshed] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Update elapsed minutes every minute
   useEffect(() => {
@@ -52,7 +57,9 @@ export default function SwarmSyncBadge({ district = "Cuddalore" }: { district?: 
   }, [district]);
 
   const displayTime =
-    elapsedMinutes === 0
+    !mounted
+      ? "3 mins ago"
+      : elapsedMinutes === 0
       ? "just now"
       : elapsedMinutes === 1
       ? "1 min ago"

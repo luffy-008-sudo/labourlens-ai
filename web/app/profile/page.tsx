@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   User,
@@ -25,15 +25,29 @@ export default function UserProfilePage() {
   const { profile, login, logout, updateProfile, parseResume } = useUserProfile();
 
   // Local form state
-  const [name, setName] = useState(profile.name);
-  const [email, setEmail] = useState(profile.email);
-  const [district, setDistrict] = useState(profile.district || "Krishnagiri");
-  const [qualification, setQualification] = useState(profile.qualification || "iti_polytechnic");
-  const [branch, setBranch] = useState(profile.branch || "Mechanical & CNC Tooling");
-  const [careerTrack, setCareerTrack] = useState<"both" | "govt" | "private">(profile.careerTrack || "both");
-  const [resumeText, setResumeText] = useState(profile.resumeSummary || "");
-  const [skills, setSkills] = useState<string[]>(profile.extractedSkills || []);
+  const [name, setName] = useState(profile?.name || "Guest Learner");
+  const [email, setEmail] = useState(profile?.email || "learner@tn.gov.in");
+  const [district, setDistrict] = useState(profile?.district || "Krishnagiri");
+  const [qualification, setQualification] = useState(profile?.qualification || "iti_polytechnic");
+  const [branch, setBranch] = useState(profile?.branch || "Mechanical & CNC Tooling");
+  const [careerTrack, setCareerTrack] = useState<"both" | "govt" | "private">(profile?.careerTrack || "both");
+  const [resumeText, setResumeText] = useState(profile?.resumeSummary || "");
+  const [skills, setSkills] = useState<string[]>(Array.isArray(profile?.extractedSkills) ? profile.extractedSkills : []);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  // Synchronize state when profile hydrates from localStorage
+  useEffect(() => {
+    if (profile) {
+      if (profile.name) setName(profile.name);
+      if (profile.email) setEmail(profile.email);
+      if (profile.district) setDistrict(profile.district);
+      if (profile.qualification) setQualification(profile.qualification);
+      if (profile.branch) setBranch(profile.branch);
+      if (profile.careerTrack) setCareerTrack(profile.careerTrack);
+      if (profile.resumeSummary !== undefined) setResumeText(profile.resumeSummary);
+      if (Array.isArray(profile.extractedSkills)) setSkills(profile.extractedSkills);
+    }
+  }, [profile]);
 
   const academicBranches = [
     "Chemical, Petrochemical & Process",
@@ -95,12 +109,12 @@ export default function UserProfilePage() {
             <div className="flex items-center justify-between gap-4 pb-2 border-b-2 border-black">
               <span className="text-zinc-600 font-extrabold uppercase text-xs">SESSION ID</span>
               <span className="px-3 py-0.5 bg-[#F5C518] text-black font-extrabold border border-black rounded-full text-xs">
-                {profile.userId}
+                {profile?.userId || "LL-TN-8492"}
               </span>
             </div>
-            <div className="font-extrabold text-black text-base truncate max-w-[220px] font-sans">{profile.name}</div>
-            <div className="text-zinc-700 text-xs font-bold truncate max-w-[220px]">{profile.email}</div>
-            {profile.isLoggedIn && (
+            <div className="font-extrabold text-black text-base truncate max-w-[220px] font-sans">{profile?.name || "Guest Learner"}</div>
+            <div className="text-zinc-700 text-xs font-bold truncate max-w-[220px]">{profile?.email || "learner@tn.gov.in"}</div>
+            {profile?.isLoggedIn && (
               <button
                 type="button"
                 onClick={logout}
@@ -341,10 +355,10 @@ export default function UserProfilePage() {
             {/* Extracted Skills Chips */}
             <div>
               <span className="text-sm font-mono font-extrabold text-black uppercase tracking-wider block mb-2.5">
-                Extracted Industrial Competencies ({skills.length}):
+                Extracted Industrial Competencies ({(skills || []).length}):
               </span>
               <div className="flex flex-wrap gap-2.5">
-                {skills.map((sk, i) => (
+                {(skills || []).map((sk, i) => (
                   <span
                     key={i}
                     className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FAF9F5] text-black border-2 border-black rounded-full text-sm font-mono font-extrabold shadow-[2px_2px_0px_0px_#000000]"

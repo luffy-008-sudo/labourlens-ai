@@ -238,7 +238,7 @@ function LearnerRoutesContent() {
   // Compute Skill Gap Diff between UserProfile and Active District Roadmap
   const requiredSkills = roadmap.districtRegistry.privateJdSkills.map((s) => s.split("(")[0].trim());
   const activeUserSkills =
-    profile.extractedSkills && profile.extractedSkills.length > 0
+    Array.isArray(profile?.extractedSkills) && profile.extractedSkills.length > 0
       ? profile.extractedSkills
       : ["Reading Technical Drawings", "Vernier Calipers & Gauges", "Safety Compliance"];
 
@@ -449,13 +449,13 @@ function LearnerRoutesContent() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-sm font-mono font-extrabold text-black uppercase tracking-wider">
                   <Sparkles className="w-4 h-4 text-black" />
-                  <span>PERSONALIZED RESUME SKILL-GAP DIFF // CANDIDATE: {profile.name.toUpperCase()}</span>
+                  <span>PERSONALIZED RESUME SKILL-GAP DIFF // CANDIDATE: {(profile?.name || "GUEST LEARNER").toUpperCase()}</span>
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-extrabold uppercase font-sans text-black">
                   Resume Alignment vs. {selectedDistrict} {roadmap.domain.name}
                 </h3>
                 <p className="text-base font-sans text-zinc-800 font-medium">
-                  Comparing your confirmed academic background ({profile.qualification}) and verified competencies against active factory job descriptions.
+                  Comparing your confirmed academic background ({profile?.qualification || "iti_polytechnic"}) and verified competencies against active factory job descriptions.
                 </p>
               </div>
 
