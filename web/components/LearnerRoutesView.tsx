@@ -21,6 +21,7 @@ import {
   Target,
   Sparkles,
   Award,
+  X,
 } from "lucide-react";
 import SpecificationTag from "@/components/SpecificationTag";
 import GoogleMapsEmbed from "@/components/GoogleMapsEmbed";
@@ -32,6 +33,7 @@ import {
   CORE_DOMAINS,
   QUALIFICATION_PATHWAYS,
   getPersonalizedRoadmap,
+  getPrimaryDomainForDistrict,
 } from "@/lib/coreDomainRoadmaps";
 
 function matchDomainFromSector(sectorQuery: string | null): string {
@@ -204,7 +206,7 @@ function RoadmapStepper({ phases }: { phases: StepperPhase[] }) {
 
 function LearnerRoutesContent() {
   const { lang } = useTranslation();
-  const { profile, selectedDistrict: contextDistrict, selectedDomain: contextDomain } = useUserProfile();
+  const { profile, selectedDistrict: contextDistrict, selectedDomain: contextDomain, setSelectedDistrict: setGlobalDistrict, updateProfile } = useUserProfile();
   const searchParams = useSearchParams();
   const queryDistrict = searchParams.get("district");
   const querySector = searchParams.get("sector");
@@ -212,12 +214,17 @@ function LearnerRoutesContent() {
   const [selectedDistrict, setSelectedDistrict] = useState<string>("Krishnagiri");
   const [selectedDomain, setSelectedDomain] = useState<string>("ev_automotive");
   const [selectedQual, setSelectedQual] = useState<string>("iti_polytechnic");
+  const [acquiredSkills, setAcquiredSkills] = useState<string[]>([]);
+  const [activeModalSkill, setActiveModalSkill] = useState<string | null>(null);
 
   // Sync with searchParams, context, or Profile
   useEffect(() => {
     const activeDist = queryDistrict || contextDistrict || profile?.district;
     if (activeDist) {
       setSelectedDistrict(activeDist);
+      if (!querySector && !contextDomain) {
+        setSelectedDomain(getPrimaryDomainForDistrict(activeDist));
+      }
     }
 
     const activeSector = querySector || contextDomain;
@@ -230,23 +237,82 @@ function LearnerRoutesContent() {
     }
   }, [queryDistrict, querySector, contextDistrict, contextDomain, profile]);
 
+  // Synchronize Target District -> Core Domain automatically
+  const handleDistrictChange = (newDistrict: string) => {
+    setSelectedDistrict(newDistrict);
+    setGlobalDistrict(newDistrict);
+    const autoDomain = getPrimaryDomainForDistrict(newDistrict);
+    setSelectedDomain(autoDomain);
+  };
+
   const roadmap = getPersonalizedRoadmap(selectedDistrict, selectedDomain, selectedQual);
   const districtObj = Object.values(TN_38_DISTRICTS).find(
     (d) => d.name.toLowerCase() === selectedDistrict.toLowerCase()
   ) || TN_38_DISTRICTS["582"];
 
-  // Compute Skill Gap Diff between UserProfile and Active District Roadmap
-  const requiredSkills = roadmap.districtRegistry.privateJdSkills.map((s) => s.split("(")[0].trim());
-  const activeUserSkills =
-    Array.isArray(profile?.extractedSkills) && profile.extractedSkills.length > 0
-      ? profile.extractedSkills
-      : ["Reading Technical Drawings", "Vernier Calipers & Gauges", "Safety Compliance"];
+  // Baseline academic skills dynamically shifting by qualification
+  const qualificationBaselines: Record<string, string[]> = {
+    "10th_12th": [
+      "Basic Workshop Safety & PPE Guidelines",
+      "Hand Tools & Vernier Caliper Basics",
+      "Shopfloor 5S Discipline",
+    ],
+    iti_polytechnic: [
+      "Technical Blueprint & P&ID Reading",
+      "Preventive Maintenance Protocols",
+      "DISH Factory Safety & Compliance Norms",
+      "Vernier Calipers & Micrometer Metrology",
+      "Basic Lathe / Milling Machine Handling",
+    ],
+    btech_graduate: [
+      "Engineering Thermodynamics & Mechanics",
+      "CAD Modeling (SolidWorks/AutoCAD)",
+      "Process Control Logic & PFD Flowsheets",
+      "Industrial Quality Assurance & Six Sigma",
+      "Emergency Shutdown (ESD) & Safety Management",
+    ],
+    career_switcher: [
+      "Industrial Documentation & Log Recording",
+      "Operational Team Communication",
+      "General Mechanical & Electrical Aptitude",
+    ],
+  };
 
-  const matchedSkills = requiredSkills.filter((req) =>
-    activeUserSkills.some((usr) => usr.toLowerCase().includes(req.toLowerCase()) || req.toLowerCase().includes(usr.toLowerCase()))
+  const academicBase = qualificationBaselines[selectedQual] || qualificationBaselines.iti_polytechnic;
+  const userProfileSkills = Array.isArray(profile?.extractedSkills) ? profile.extractedSkills : [];
+
+  // Active verified user skills combining academic degree baseline + profile + newly acquired
+  const activeUserSkills = Array.from(
+    new Set([...academicBase, ...userProfileSkills, ...acquiredSkills])
   );
-  const missingSkills = requiredSkills.filter((req) => !matchedSkills.includes(req));
-  const readinessPercent = Math.min(100, Math.max(35, Math.round((matchedSkills.length / Math.max(1, requiredSkills.length)) * 100)));
+
+  // Dynamic demanded skills: combining domain equipment and verified district JD skills
+  const allRequiredSkills = Array.from(
+    new Set([
+      ...roadmap.domain.factoryEquipmentDemanded.map((s) => s.split("(")[0].trim()),
+      ...roadmap.districtRegistry.privateJdSkills.map((s) => s.split("(")[0].trim()),
+    ])
+  );
+
+  const matchedSkills = allRequiredSkills.filter((req) =>
+    activeUserSkills.some((usr) => {
+      const u = usr.toLowerCase();
+      const r = req.toLowerCase();
+      return u.includes(r.slice(0, 8)) || r.includes(u.slice(0, 8));
+    })
+  );
+
+  const missingSkills = allRequiredSkills.filter((req) => !matchedSkills.includes(req));
+
+  // Dynamic Industry Readiness Score % (shifts with degree level and acquired skills)
+  const qualBaseWeight =
+    selectedQual === "btech_graduate"
+      ? 58
+      : selectedQual === "iti_polytechnic"
+      ? 44
+      : 26;
+  const matchRatio = allRequiredSkills.length > 0 ? (matchedSkills.length / allRequiredSkills.length) * 44 : 0;
+  const readinessPercent = Math.min(100, Math.max(30, Math.round(qualBaseWeight + matchRatio)));
 
   // Stepper Phases
   const stepperPhases: StepperPhase[] = [
@@ -383,7 +449,7 @@ function LearnerRoutesContent() {
             </span>
             <select
               value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
+              onChange={(e) => handleDistrictChange(e.target.value)}
               className="w-full text-base font-extrabold font-mono bg-[#FAF9F5] border-2 border-black rounded-xl p-3 text-black focus:outline-none focus:bg-white shadow-[2px_2px_0px_0px_#000000]"
             >
               {Object.values(TN_38_DISTRICTS).map((d) => (
@@ -413,7 +479,7 @@ function LearnerRoutesContent() {
               ))}
             </select>
             <span className="text-xs font-mono text-black font-extrabold block">
-              YoY Growth: <strong className="bg-[#F5C518] px-1.5 rounded">{roadmap.domain.yoyGrowth}</strong>
+              YoY Growth: <strong className="bg-[#F5C518] px-1.5 rounded">{roadmap.districtRegistry.growthRateYoY || roadmap.domain.yoyGrowth}</strong>
             </span>
           </div>
 
@@ -516,17 +582,16 @@ function LearnerRoutesContent() {
                   {missingSkills.map((sk, i) => (
                     <div
                       key={i}
-                      className="p-3 bg-[#FAF9F5] border-2 border-black rounded-xl flex items-center justify-between text-sm font-mono shadow-[1px_1px_0px_0px_#000000]"
+                      className="p-3 bg-[#FAF9F5] border-2 border-black rounded-xl flex items-center justify-between text-sm font-mono shadow-[1px_1px_0px_0px_#000000] gap-2"
                     >
                       <span className="font-extrabold text-black">{sk}</span>
-                      <a
-                        href="https://bharatskills.gov.in"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-swiss-yellow text-xs py-1 px-3 inline-flex items-center gap-1"
+                      <button
+                        type="button"
+                        onClick={() => setActiveModalSkill(sk)}
+                        className="btn-swiss-yellow text-xs py-1.5 px-3.5 inline-flex items-center gap-1 font-mono font-extrabold shadow-[2px_2px_0px_0px_#000000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all shrink-0"
                       >
-                        <span>Learn ↗</span>
-                      </a>
+                        <span>LEARN ↗</span>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -540,6 +605,123 @@ function LearnerRoutesContent() {
 
             </div>
           </div>
+
+          {/* ══════════════════════════════════════════════════════════════════════
+              INTERACTIVE VOCATIONAL SKILL ACQUISITION MODAL (LEARN ↗)
+          ══════════════════════════════════════════════════════════════════════ */}
+          {activeModalSkill && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-[#F4F4F1] border-4 border-black rounded-[28px] max-w-xl w-full p-6 sm:p-8 shadow-[8px_8px_0px_0px_#000000] space-y-6 animate-in fade-in zoom-in-95 font-sans relative">
+                
+                {/* Modal Header */}
+                <div className="flex items-start justify-between pb-4 border-b-2 border-black gap-4">
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F5C518] border border-black rounded-full text-xs font-mono font-extrabold uppercase text-black shadow-[1px_1px_0px_0px_#000000]">
+                      <Sparkles className="w-3.5 h-3.5 text-black" />
+                      <span>VOCATIONAL SKILL ACQUISITION</span>
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-black font-sans uppercase">
+                      {activeModalSkill}
+                    </h3>
+                    <span className="text-xs font-mono font-bold text-zinc-600 block">
+                      Target Focus: {selectedDistrict} · {roadmap.domain.name}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveModalSkill(null)}
+                    className="p-2 bg-white border-2 border-black rounded-full hover:bg-red-100 transition-colors shadow-[2px_2px_0px_0px_#000000]"
+                    aria-label="Close modal"
+                  >
+                    <X className="w-5 h-5 text-black" />
+                  </button>
+                </div>
+
+                {/* Local Hands-On Facility */}
+                <div className="bg-white border-2 border-black rounded-2xl p-4 sm:p-5 shadow-[3px_3px_0px_0px_#000000] space-y-2">
+                  <div className="flex items-center gap-2 font-mono text-xs font-extrabold text-black uppercase">
+                    <Building className="w-4 h-4 text-black" />
+                    <span>Local Hands-on Facility ({selectedDistrict}):</span>
+                  </div>
+                  <div className="font-extrabold text-base text-black font-sans">
+                    {roadmap.districtRegistry.nearbyItisAndTraining[0]?.name || `Government ITI ${selectedDistrict}`}
+                  </div>
+                  <p className="text-xs font-mono text-zinc-700 font-bold">
+                    Location: {roadmap.districtRegistry.nearbyItisAndTraining[0]?.location || `${selectedDistrict} District Complex`} · State-Funded Labs &amp; Workshops
+                  </p>
+                </div>
+
+                {/* Free Government Modules */}
+                <div className="space-y-3">
+                  <span className="text-xs font-mono font-extrabold text-zinc-700 uppercase block">
+                    FREE ACCREDITED GOVERNMENT VIDEO &amp; THEORY MODULES:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <a
+                      href="https://bharatskills.gov.in"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 bg-white border-2 border-black rounded-xl hover:bg-[#FAF9F5] shadow-[2px_2px_0px_0px_#000000] flex items-center justify-between group"
+                    >
+                      <div>
+                        <span className="text-[11px] font-mono font-extrabold bg-[#F5C518] px-1.5 py-0.5 rounded border border-black block w-fit mb-1">
+                          DGT BHARAT SKILLS
+                        </span>
+                        <span className="font-bold text-xs text-black block">CTS Trade E-Learning</span>
+                        <span className="text-[10px] text-zinc-600 font-mono">100% Free · DGT Certified</span>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </a>
+
+                    <a
+                      href="https://nptel.ac.in"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 bg-white border-2 border-black rounded-xl hover:bg-[#FAF9F5] shadow-[2px_2px_0px_0px_#000000] flex items-center justify-between group"
+                    >
+                      <div>
+                        <span className="text-[11px] font-mono font-extrabold bg-[#F5C518] px-1.5 py-0.5 rounded border border-black block w-fit mb-1">
+                          NPTEL / IIT MADRAS
+                        </span>
+                        <span className="font-bold text-xs text-black block">Process Engineering Tech</span>
+                        <span className="text-[10px] text-zinc-600 font-mono">100% Free · Ministry of Edu</span>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Modal Actions */}
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t-2 border-black">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (activeModalSkill) {
+                        setAcquiredSkills((prev) => [...prev, activeModalSkill]);
+                        updateProfile({
+                          extractedSkills: Array.from(new Set([...activeUserSkills, activeModalSkill])),
+                        });
+                        setActiveModalSkill(null);
+                      }
+                    }}
+                    className="btn-swiss-yellow w-full sm:w-auto text-sm py-3 px-6 inline-flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-black" />
+                    <span>✓ Mark Skill as Acquired</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveModalSkill(null)}
+                    className="w-full sm:w-auto text-sm py-2.5 px-5 font-mono font-extrabold text-zinc-700 hover:text-black border-2 border-black rounded-full bg-white hover:bg-zinc-100 shadow-[2px_2px_0px_0px_#000000]"
+                  >
+                    Close Window
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
 
           {/* ══════════════════════════════════════════════════════════════════════
               GOVERNMENT / PSU VS. PRIVATE CORE ROLE CLASSIFIER EMBED

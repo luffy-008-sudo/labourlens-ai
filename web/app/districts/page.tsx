@@ -210,7 +210,7 @@ function SectorGalleryCard({
 /* ─── Main District Dashboard ─────────────────────────────────────────────── */
 function DistrictDashboardContent() {
   const { lang } = useTranslation();
-  const { profile, selectedDistrict } = useUserProfile();
+  const { profile, selectedDistrict, setSelectedDistrict } = useUserProfile();
   const searchParams = useSearchParams();
   const paramDistrict = searchParams.get("district");
 
@@ -508,7 +508,12 @@ function DistrictDashboardContent() {
               </div>
               <select
                 value={districtLgd}
-                onChange={(e) => setDistrictLgd(e.target.value)}
+                onChange={(e) => {
+                  const newLgd = e.target.value;
+                  setDistrictLgd(newLgd);
+                  const dObj = TN_38_DISTRICTS[newLgd];
+                  if (dObj) setSelectedDistrict(dObj.name);
+                }}
                 className="w-full text-sm font-extrabold font-mono bg-[#FAF9F5] border-2 border-black rounded-xl p-3 text-black focus:outline-none focus:bg-white shadow-[2px_2px_0px_0px_#000000]"
               >
                 {Object.values(TN_38_DISTRICTS).map((d) => (

@@ -7,6 +7,59 @@
 
 import { getDistrictRegistry, DistrictRegistryEntry } from "./tnDistrictsRegistry";
 
+export const DISTRICT_TO_PRIMARY_DOMAIN: Record<string, string> = {
+  Krishnagiri: "ev_automotive",
+  Cuddalore: "chemical",
+  Coimbatore: "automation_cnc",
+  Thoothukudi: "renewable_energy",
+  Tiruchirappalli: "heavy_engineering",
+  Salem: "heavy_engineering",
+  Tirunelveli: "renewable_energy",
+  Kancheepuram: "ev_automotive",
+  Chengalpattu: "ev_automotive",
+  Chennai: "ev_automotive",
+  Tiruvallur: "ev_automotive",
+  Ranipet: "chemical",
+  Vellore: "chemical",
+  Tirupathur: "chemical",
+  Tiruppur: "textiles_dyeing",
+  Erode: "textiles_dyeing",
+  Karur: "textiles_dyeing",
+  Madurai: "automation_cnc",
+  Dindigul: "agro_processing",
+  Theni: "agro_processing",
+  Dharmapuri: "agro_processing",
+  Namakkal: "ev_automotive",
+  Nilgiris: "agro_processing",
+  Thanjavur: "agro_processing",
+  Tiruvarur: "agro_processing",
+  Nagapattinam: "chemical",
+  Mayiladuthurai: "agro_processing",
+  Pudukkottai: "heavy_engineering",
+  Ariyalur: "heavy_engineering",
+  Perambalur: "heavy_engineering",
+  Ramanathapuram: "renewable_energy",
+  Sivaganga: "heavy_engineering",
+  Virudhunagar: "heavy_engineering",
+  Tenkasi: "textiles_dyeing",
+  Kanniyakumari: "renewable_energy",
+  Kallakurichi: "agro_processing",
+  Viluppuram: "agro_processing",
+  Tiruvannamalai: "agro_processing",
+};
+
+export function getPrimaryDomainForDistrict(districtName: string): string {
+  if (!districtName) return "ev_automotive";
+  if (DISTRICT_TO_PRIMARY_DOMAIN[districtName]) {
+    return DISTRICT_TO_PRIMARY_DOMAIN[districtName];
+  }
+  const lower = districtName.toLowerCase().trim();
+  for (const [dist, dom] of Object.entries(DISTRICT_TO_PRIMARY_DOMAIN)) {
+    if (dist.toLowerCase() === lower) return dom;
+  }
+  return "ev_automotive";
+}
+
 export interface DomainProfile {
   id: string;
   name: string;
