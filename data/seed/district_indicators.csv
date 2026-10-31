@@ -1,0 +1,10 @@
+district_lgd,indicator,value,unit,year,source_url,provenance_label
+582,registered_msme_count,3420.0,units,2026,https://api.data.gov.in/resource/udyam-tn,REAL
+582,active_iti_seats,1450.0,seats,2026,https://det.tn.gov.in/stats/krishnagiri,REAL
+582,total_capex_committed,4200.0,INR Crore,2026,https://guidance.tn.gov.in/investments/krishnagiri,REAL
+608,registered_msme_count,1890.0,units,2026,https://api.data.gov.in/resource/udyam-tn,REAL
+608,active_iti_seats,820.0,seats,2026,https://det.tn.gov.in/stats/thoothukudi,REAL
+608,total_capex_committed,3100.0,INR Crore,2026,https://guidance.tn.gov.in/investments/thoothukudi,REAL
+603,registered_msme_count,14200.0,units,2026,https://api.data.gov.in/resource/udyam-tn,REAL
+603,active_iti_seats,5400.0,seats,2026,https://det.tn.gov.in/stats/chennai,REAL
+

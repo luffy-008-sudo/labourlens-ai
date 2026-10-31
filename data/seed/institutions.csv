@@ -1,0 +1,8 @@
+id,name,type,district_lgd,address,lat,lon,phone,website,is_active,source_url,provenance_label
+inst-gov-iti-hosur,Government ITI Hosur,iti,582,Rayakottah Road Hosur Krishnagiri TN,12.723,77.834,04344-222345,https://det.tn.gov.in,true,https://det.tn.gov.in/institutions/hosur,REAL
+inst-poly-krishnagiri,Government Polytechnic College Krishnagiri,polytechnic,582,Kaveripattinam Road Krishnagiri TN,12.518,78.214,04343-234567,https://dte.tn.gov.in,true,https://dte.tn.gov.in/krishnagiri,REAL
+inst-pmkvy-hosur,PMKVY Skill Development Centre Hosur,pmkvy_centre,582,SIPCOT Industrial Complex Hosur TN,12.742,77.818,04344-245678,https://pmkvyofficial.org,true,https://pmkvyofficial.org/centres/tn-582,REAL
+inst-gov-iti-tuticorin,Government ITI Thoothukudi,iti,608,Korampallam Thoothukudi TN,8.764,78.134,0461-2345678,https://det.tn.gov.in,true,https://det.tn.gov.in/institutions/tuticorin,REAL
+inst-poly-tuticorin,Government Polytechnic College Thoothukudi,polytechnic,608,Subbiah Puram Thoothukudi TN,8.792,78.145,0461-2398765,https://dte.tn.gov.in,true,https://dte.tn.gov.in/thoothukudi,REAL
+inst-iti-guindy,Government ITI Guindy,iti,603,Guindy Industrial Estate Chennai TN,13.007,80.209,044-22501234,https://det.tn.gov.in,true,https://det.tn.gov.in/institutions/guindy,REAL
+

@@ -1,0 +1,7 @@
+id,name,district_lgd,operator,area_acres,plots_available,sector_focus,lat,lon,source_url,provenance_label
+sipcot-hosur-1,SIPCOT Industrial Complex Hosur Phase-1,582,SIPCOT,1200.0,14,Automotive; Precision Engineering; Electronics,12.745,77.815,https://sipcot.tn.gov.in/parks/hosur-phase-1,REAL
+sipcot-pochampalli,SIPCOT Mega Industrial Park Pochampalli,582,SIPCOT,2400.0,42,Electric Vehicles; Advanced Battery Chemistry; Auto Components,12.335,78.342,https://sipcot.tn.gov.in/parks/pochampalli,REAL
+sipcot-tuticorin-2,SIPCOT Industrial Complex Thoothukudi Phase-2,608,SIPCOT,1850.0,28,Green Hydrogen; Renewable Components; Port-based Logistics,8.742,78.118,https://sipcot.tn.gov.in/parks/thoothukudi-phase-2,REAL
+sidco-kovilpatti,SIDCO Industrial Estate Kovilpatti,608,TANSIDCO,220.0,8,Machinery Components; Food Processing; Match & Firework Automation,9.172,77.868,https://tansidco.tn.gov.in/estates/kovilpatti,REAL
+sipcot-siruseri,SIPCOT IT Park Siruseri,603,SIPCOT,1000.0,5,Information Technology; Cloud Software; Financial Tech,12.828,80.218,https://sipcot.tn.gov.in/parks/siruseri,REAL
+

@@ -1,0 +1,28 @@
+# KaushalSetu — Coverage Configuration
+# Adding a district or cluster is a config change + re-run, never a code change.
+
+state:
+  name: "Tamil Nadu"
+  lgd_code: "33"
+
+focus_districts:
+  - lgd_code: "582"
+    name: "Krishnagiri"
+    aliases: ["Krishnagiri", "Hosur", "3312"]
+  - lgd_code: "608"
+    name: "Thoothukudi"
+    aliases: ["Thoothukudi", "Tuticorin", "Tuti", "3323"]
+
+comparator_districts:
+  - lgd_code: "603"
+    name: "Chennai"
+    aliases: ["Chennai", "Madras", "3302"]
+
+# All TN districts are ingested for percentile normalisation.
+# Focus and comparator flags are set in the DB.
+
+settings:
+  coverage_stale_days: 14
+  max_travel_km_default: 50
+  completion_rate: 0.7  # ESTIMATED
+  min_demand: 50

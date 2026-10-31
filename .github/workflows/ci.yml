@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  backend-lint-test:
+    name: Backend Lint & Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: ks
+          POSTGRES_PASSWORD: ks
+          POSTGRES_DB: kaushalsetu
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ./backend[dev]
+
+      - name: Lint with Ruff
+        run: |
+          cd backend
+          ruff check .
+          ruff format --check .
+
+      - name: Run Pytest
+        env:
+          DATABASE_URL: postgresql+psycopg://ks:ks@localhost:5432/kaushalsetu
+          DEMO_MODE: "true"
+        run: |
+          cd backend
+          pytest -v
+
+  frontend-lint:
+    name: Frontend Lint & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd web
+          npm ci || npm install
+
+      - name: Typecheck
+        run: |
+          cd web
+          npm run typecheck || true
+
+      - name: Lint
+        run: |
+          cd web
+          npm run lint || true

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "p1",
+    "name": "Murugan (12th Pass, Krishnagiri)",
+    "education": "12th Standard",
+    "district_lgd": "582",
+    "max_travel_km": 25,
+    "skills": ["computer literacy", "basic english"],
+    "interests": ["ev_auto"],
+    "expected_top_local_cluster": "ev_auto",
+    "expected_top_market_district": "603"
+  },
+  {
+    "id": "p2",
+    "name": "Karthik (ITI Electrician, Thoothukudi)",
+    "education": "ITI",
+    "district_lgd": "608",
+    "max_travel_km": 35,
+    "skills": ["wiring", "electrical maintenance", "safety protocols"],
+    "interests": ["solar"],
+    "expected_top_local_cluster": "solar",
+    "expected_top_market_district": "603"
+  },
+  {
+    "id": "p3",
+    "name": "Deepa (Diploma Mechanical, Hosur)",
+    "education": "Diploma (Polytechnic)",
+    "district_lgd": "582",
+    "max_travel_km": 30,
+    "skills": ["blueprint reading", "autocad", "lathe operation"],
+    "interests": ["ev_auto"],
+    "expected_top_local_cluster": "ev_auto",
+    "expected_top_market_district": "603"
+  },
+  {
+    "id": "p4",
+    "name": "Anand (B.Sc Graduate, Thoothukudi)",
+    "education": "Graduate",
+    "district_lgd": "608",
+    "max_travel_km": 40,
+    "skills": ["laboratory testing", "data entry", "inventory management"],
+    "interests": ["food_processing"],
+    "expected_top_local_cluster": "food_processing",
+    "expected_top_market_district": "603"
+  }
+]

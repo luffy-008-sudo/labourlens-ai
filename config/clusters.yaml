@@ -1,0 +1,152 @@
+# KaushalSetu — Industry Clusters Configuration
+# Each cluster maps to NIC-2008 codes, search keywords, and related trades/occupations.
+
+clusters:
+  - slug: "solar"
+    name: "Solar & Renewables"
+    status: active
+    nic_codes:
+      - "2710"   # Manufacture of electric motors, generators, transformers
+      - "2720"   # Manufacture of batteries and accumulators
+      - "2790"   # Manufacture of other electrical equipment
+      - "3510"   # Electric power generation
+      - "3311"   # Repair of fabricated metal products, machinery
+      - "2599"   # Manufacture of other fabricated metal products n.e.c.
+    keywords:
+      en:
+        - "solar panel"
+        - "solar module"
+        - "solar cell"
+        - "photovoltaic"
+        - "PV manufacturing"
+        - "solar park"
+        - "renewable energy"
+        - "solar inverter"
+        - "green energy"
+        - "solar power plant"
+        - "solar EPC"
+      ta:
+        - "சோலார் பேனல்"
+        - "சூரிய மின்சக்தி"
+        - "சோலார் தொழிற்சாலை"
+        - "புதுப்பிக்கத்தக்க எரிசக்தி"
+        - "சூரிய மின் நிலையம்"
+      hi:
+        - "सोलर पैनल"
+        - "सौर ऊर्जा"
+        - "सोलर मॉड्यूल"
+        - "नवीकरणीय ऊर्जा"
+    related_trades:
+      - "Electrician"
+      - "Solar Technician"
+      - "Wireman"
+      - "Electronic Mechanic"
+      - "Fitter"
+    nco_codes:
+      - "7411"   # Building and related electricians
+      - "7412"   # Electrical mechanics and fitters
+      - "7413"   # Electrical line installers and repairers
+      - "3113"   # Electrical engineering technicians
+
+  - slug: "ev_auto"
+    name: "EV & Auto Components"
+    status: active
+    nic_codes:
+      - "2910"   # Manufacture of motor vehicles
+      - "2920"   # Manufacture of bodies for motor vehicles
+      - "2930"   # Manufacture of parts and accessories for motor vehicles
+      - "2720"   # Batteries & accumulators (shared with solar)
+      - "2211"   # Manufacture of rubber tyres and tubes
+      - "2219"   # Manufacture of other rubber products
+      - "2511"   # Manufacture of structural metal products
+    keywords:
+      en:
+        - "EV plant"
+        - "electric vehicle"
+        - "auto component"
+        - "battery assembly"
+        - "EV battery"
+        - "automobile"
+        - "auto parts"
+        - "vehicle manufacturing"
+        - "lithium battery"
+        - "EV charging"
+        - "two-wheeler"
+        - "electric bus"
+      ta:
+        - "மின்சார வாகனம்"
+        - "ஈவி தொழிற்சாலை"
+        - "வாகன உதிரிபாகங்கள்"
+        - "மின்கலன்"
+        - "ஆட்டோ பாகங்கள்"
+      hi:
+        - "इलेक्ट्रिक वाहन"
+        - "ईवी प्लांट"
+        - "ऑटो कंपोनेंट"
+        - "बैटरी"
+    related_trades:
+      - "Motor Mechanic Vehicle"
+      - "Fitter"
+      - "Turner"
+      - "Machinist"
+      - "Welder"
+      - "Electrician"
+      - "Electronic Mechanic"
+    nco_codes:
+      - "7231"   # Motor vehicle mechanics and repairers
+      - "7223"   # Metal working machine tool setters and operators
+      - "7212"   # Welders and flame cutters
+      - "7411"   # Building and related electricians
+
+  - slug: "food_processing"
+    name: "Food Processing"
+    status: active
+    nic_codes:
+      - "1010"   # Processing and preserving of meat
+      - "1020"   # Processing and preserving of fish
+      - "1030"   # Processing and preserving of fruit and vegetables
+      - "1040"   # Manufacture of vegetable and animal oils and fats
+      - "1050"   # Manufacture of dairy products
+      - "1061"   # Manufacture of grain mill products
+      - "1071"   # Manufacture of bakery products
+      - "1072"   # Manufacture of sugar
+      - "1079"   # Manufacture of other food products n.e.c.
+      - "1080"   # Manufacture of prepared animal feeds
+      - "1104"   # Manufacture of soft drinks; mineral waters
+    keywords:
+      en:
+        - "food processing"
+        - "food park"
+        - "cold chain"
+        - "cold storage"
+        - "fish processing"
+        - "seafood export"
+        - "mega food park"
+        - "dairy plant"
+        - "fruit processing"
+        - "spice processing"
+        - "rice mill"
+        - "cashew processing"
+      ta:
+        - "உணவு பதப்படுத்துதல்"
+        - "உணவு பூங்கா"
+        - "குளிர்பதன சேமிப்பு"
+        - "மீன் பதப்படுத்துதல்"
+        - "கடல் உணவு ஏற்றுமதி"
+        - "பால் பண்ணை"
+      hi:
+        - "खाद्य प्रसंस्करण"
+        - "फूड पार्क"
+        - "कोल्ड स्टोरेज"
+        - "डेयरी"
+    related_trades:
+      - "Food Production (General)"
+      - "Baker & Confectioner"
+      - "Fruit & Vegetable Processor"
+      - "Refrigeration & Air Conditioning"
+      - "Mechanic Diesel"
+    nco_codes:
+      - "7511"   # Butchers, fishmongers and related food preparers
+      - "7512"   # Bakers, pastry-cooks and confectionery makers
+      - "8160"   # Food and related products machine operators
+      - "3141"   # Life science technicians (food tech)

@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: kaushalsetu-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ks}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ks}
+      POSTGRES_DB: ${POSTGRES_DB:-kaushalsetu}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ks} -d ${POSTGRES_DB:-kaushalsetu}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kaushalsetu-api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+      - ./config:/config:ro
+      - ./data:/data
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg://ks:ks@db:5432/kaushalsetu
+      - CONFIG_DIR=/config
+      - DATA_DIR=/data
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kaushalsetu-worker
+    command: python -m app.worker.scheduler
+    volumes:
+      - ./backend:/app
+      - ./config:/config:ro
+      - ./data:/data
+    environment:
+      - DATABASE_URL=postgresql+psycopg://ks:ks@db:5432/kaushalsetu
+      - CONFIG_DIR=/config
+      - DATA_DIR=/data
+    env_file:
+      - .env
+    depends_on:
+      api:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: kaushalsetu-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

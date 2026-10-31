@@ -1,0 +1,94 @@
+# KaushalSetu — Scoring Configuration
+# Version is stored with every score row for reproducibility.
+
+version: "1.0.0"
+
+# --- Confidence Scoring (§6.1 step 5) ---
+confidence:
+  weights:
+    max_tier: 0.55
+    corroboration: 0.30
+    status: 0.15
+
+  source_tier_weights:
+    official_gov: 1.0
+    psu_or_state_corp: 0.95
+    company: 0.85
+    national_media: 0.75
+    regional_media: 0.65
+    aggregator: 0.45
+    social: 0.2
+
+  status_weights:
+    rumoured: 0.2
+    announced: 0.5
+    mou_signed: 0.6
+    land_allotted: 0.7
+    approved: 0.75
+    under_construction: 0.85
+    operational: 1.0
+    expansion: 0.8
+    cancelled: 0.0
+
+  thresholds:
+    auto_accept: 0.75
+    review_min: 0.45
+
+# --- Scalability Sub-scores (§6.2 step 2) ---
+scalability:
+  weights:
+    momentum: 0.30
+    maturity: 0.20
+    cluster_depth: 0.20
+    infra_readiness: 0.15
+    policy_tailwind: 0.15
+
+  momentum:
+    decay_months: 18           # exp(-age_months / decay_months)
+    lookback_months: 24
+
+  cluster_depth:
+    msme_weight: 0.50
+    growth_weight: 0.50
+
+# --- Opportunity Score (§6.3) ---
+opportunity:
+  local_priority:
+    signal_strength: 0.40
+    skill_gap: 0.30
+    equity_boost: 0.30
+
+  market:
+    # Pure volume ranking; equity = 0
+    labour_demand_weight: 1.0
+
+  min_demand: 50               # jobs; viability floor
+  completion_rate: 0.70        # ESTIMATED; for supply calculation
+
+# --- Learner Matching (§6.5) ---
+matching:
+  skill_fit:
+    cosine_weight: 0.60
+    jaccard_weight: 0.40
+  distance_decay_km: 40       # exp(-distance_km / this)
+  max_routes: 3
+
+# --- Deduplication (§6.1 step 4) ---
+dedupe:
+  company_trigram_threshold: 0.60
+  embedding_cosine_threshold: 0.85
+  investment_tolerance: 0.25   # ±25%
+  time_window_days: 180
+
+# --- Grounding (§6.1 step 3) ---
+grounding:
+  evidence_min_similarity: 92  # rapidfuzz partial ratio
+  max_article_chars: 12000
+
+# --- Budget ---
+budget:
+  default_max_tokens: 400000
+  default_max_tool_calls: 50
+  enrich_max_tool_calls: 6
+  triage_batch_size: 20
+  k_per_target: 8

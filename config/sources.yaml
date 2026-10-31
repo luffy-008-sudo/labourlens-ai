@@ -1,0 +1,183 @@
+# KaushalSetu — Sources Registry
+# Every source: base URL, tier, rate limit, robots policy, licence
+
+sources:
+  # --- Government Open Data ---
+  - id: ogd_udyam_totals
+    name: "data.gov.in — Udyam District Totals"
+    base_url: "https://api.data.gov.in/resource/"
+    resource_id: null  # To be discovered via scripts/discover_ogd.py
+    tier: official_gov
+    rate_limit_rps: 2
+    robots_ok: true
+    licence: "GODL-India"
+    status: planned
+
+  - id: ogd_udyam_units
+    name: "data.gov.in — Udyam Unit List"
+    base_url: "https://api.data.gov.in/resource/"
+    resource_id: "8b68ae56-84cf-4728-a0a6-1be11028dea7"  # To verify
+    tier: official_gov
+    rate_limit_rps: 2
+    robots_ok: true
+    licence: "GODL-India"
+    status: planned
+    notes: "Aggregate only. Discard PII after in-memory computation."
+
+  - id: ogd_eshram
+    name: "data.gov.in — eShram Demographics"
+    base_url: "https://api.data.gov.in/resource/"
+    resource_id: "1d4d1c5a-feea-423b-be4f-c3636fdd1d82"  # To verify
+    tier: official_gov
+    rate_limit_rps: 2
+    robots_ok: true
+    licence: "GODL-India"
+    status: planned
+    notes: "Suppress counts below 10."
+
+  - id: ndap
+    name: "NITI Aayog NDAP"
+    base_url: "https://ndap.niti.gov.in"
+    tier: official_gov
+    rate_limit_rps: 1
+    robots_ok: true
+    licence: "Government of India"
+    status: planned
+    notes: "May need API key. CSV fallback available."
+
+  - id: lgd
+    name: "Local Government Directory"
+    base_url: "https://lgdirectory.gov.in"
+    tier: official_gov
+    rate_limit_rps: 1
+    robots_ok: true
+    licence: "Government of India"
+    status: planned
+
+  - id: tn_data
+    name: "Tamil Nadu Open Data"
+    base_url: "https://tn.data.gov.in"
+    tier: official_gov
+    rate_limit_rps: 2
+    robots_ok: true
+    licence: "GODL-India"
+    status: planned
+
+  # --- Training & Skills ---
+  - id: ncvt_mis
+    name: "NCVT MIS ITI Portal"
+    base_url: "https://ncvtmis.gov.in"
+    tier: official_gov
+    rate_limit_rps: 0.5
+    robots_ok: true
+    licence: "Public"
+    status: planned
+    notes: "Selenium scraper. State → district search."
+
+  - id: nqr
+    name: "National Qualifications Register"
+    base_url: "https://nqr.gov.in"
+    tier: official_gov
+    rate_limit_rps: 1
+    robots_ok: true
+    licence: "Public"
+    status: planned
+
+  - id: skill_india
+    name: "Skill India Digital Hub"
+    base_url: "https://skillindiadigital.gov.in"
+    tier: official_gov
+    rate_limit_rps: 0.5
+    robots_ok: true
+    licence: "Public"
+    status: planned
+    notes: "No bulk download. Browse district by district."
+
+  - id: apprenticeship_india
+    name: "Apprenticeship India"
+    base_url: "https://apprenticeshipindia.gov.in"
+    tier: official_gov
+    rate_limit_rps: 0.5
+    robots_ok: true
+    licence: "Public"
+    status: planned
+
+  # --- Industrial Parks ---
+  - id: sipcot
+    name: "SIPCOT Tamil Nadu"
+    base_url: "https://sipcot.tn.gov.in"
+    tier: psu_or_state_corp
+    rate_limit_rps: 0.5
+    robots_ok: true
+    licence: "Public"
+    status: planned
+
+  - id: iilb
+    name: "India Industrial Land Bank"
+    base_url: "https://iilb.gov.in"
+    tier: official_gov
+    rate_limit_rps: 0.5
+    robots_ok: true
+    licence: "Public"
+    status: planned
+
+  # --- News & Signals ---
+  - id: gdelt
+    name: "GDELT DOC 2.0 API"
+    base_url: "https://api.gdeltproject.org/api/v2/doc/doc"
+    tier: aggregator
+    rate_limit_rps: 1
+    robots_ok: true
+    licence: "Free / Public"
+    status: planned
+    notes: "~3-month lookback. ≤250 records/query."
+
+  - id: gnews_rss
+    name: "Google News RSS"
+    base_url: "https://news.google.com/rss/search"
+    tier: aggregator
+    rate_limit_rps: 0.5
+    robots_ok: true
+    licence: "Public RSS"
+    status: planned
+    notes: "hl=en-IN&gl=IN for Indian news."
+
+  - id: pib
+    name: "Press Information Bureau"
+    base_url: "https://pib.gov.in"
+    tier: official_gov
+    rate_limit_rps: 1
+    robots_ok: true
+    licence: "GODL-India"
+    status: planned
+
+  # --- Geolocation ---
+  - id: gmaps
+    name: "Google Maps Platform"
+    base_url: "https://maps.googleapis.com"
+    tier: company
+    rate_limit_rps: 10
+    robots_ok: true
+    licence: "Google Maps ToS"
+    status: planned
+    notes: "Places API for ITI geolocation. Requires GOOGLE_MAPS_API_KEY."
+
+# --- URL allow patterns for agent tools ---
+allow_patterns:
+  - "*.gov.in"
+  - "*.nic.in"
+  - "api.gdeltproject.org"
+  - "news.google.com"
+  - "maps.googleapis.com"
+  - "*.reuters.com"
+  - "*.thehindu.com"
+  - "*.livemint.com"
+  - "*.economictimes.com"
+  - "*.ndtv.com"
+  - "*.business-standard.com"
+  - "*.thehindubusinessline.com"
+  - "*.newindianexpress.com"
+  - "*.deccanherald.com"
+  - "*.dailythanthi.com"
+  - "*.dinamalar.com"
+  - "*.dinamani.com"

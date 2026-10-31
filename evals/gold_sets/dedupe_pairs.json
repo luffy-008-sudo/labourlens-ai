@@ -1,0 +1,27 @@
+[
+  {
+    "id": "pair-1",
+    "article_a": "Ola Electric announces ₹2,400 Cr expansion at Pochampalli, Krishnagiri.",
+    "article_b": "Ola to invest ₹2,400 crore in Tamil Nadu FutureFactory located in Krishnagiri.",
+    "should_merge": true
+  },
+  {
+    "id": "pair-2",
+    "article_a": "Siemens Gamesa breaks ground in Tuticorin for wind turbine and hydrogen blades.",
+    "article_b": "ACME and Siemens Gamesa launch ₹1,800 Cr green hydrogen manufacturing in Thoothukudi.",
+    "should_merge": true
+  },
+  {
+    "id": "pair-3",
+    "article_a": "Ather Energy opens new battery plant in Hosur with 800 positions.",
+    "article_b": "TVS Motor announces ₹1,200 Cr two-wheeler line in Hosur.",
+    "should_merge": false
+  },
+  {
+    "id": "pair-4",
+    "article_a": "IFS Logistics launches food processing cold chain terminal in Krishnagiri.",
+    "article_b": "Reliance Retail expands warehouse infrastructure in Chennai suburbs.",
+    "should_merge": false
+  }
+]
+

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "gold-1",
+    "text": "Ola Electric has commenced phase 2 expansion at its Pochampalli FutureFactory in Krishnagiri district with an investment commitment of ₹2,400 crore, creating over 2,100 jobs for skilled technician and assembly line workers.",
+    "is_relevant": true,
+    "ground_truth": {
+      "company": "Ola Electric",
+      "district_lgd": "582",
+      "cluster_slug": "ev_auto",
+      "investment_inr_cr": 2400.0,
+      "jobs_direct": 2100,
+      "status": "announced"
+    }
+  },
+  {
+    "id": "gold-2",
+    "text": "Siemens Gamesa in partnership with renewable developer ACME has broken ground on a ₹1,800 crore turbine component and green hydrogen equipment manufacturing unit in Tuticorin SIPCOT Phase-2.",
+    "is_relevant": true,
+    "ground_truth": {
+      "company": "Siemens Gamesa",
+      "district_lgd": "608",
+      "cluster_slug": "green_hydrogen",
+      "investment_inr_cr": 1800.0,
+      "jobs_direct": null,
+      "status": "groundbreaking"
+    }
+  },
+  {
+    "id": "gold-3",
+    "text": "IFS Logistics has commissioned its 150-acre integrated agro-processing and cold chain terminal in Krishnagiri with an initial capital outlay of ₹350 crore.",
+    "is_relevant": true,
+    "ground_truth": {
+      "company": "IFS Logistics",
+      "district_lgd": "582",
+      "cluster_slug": "food_processing",
+      "investment_inr_cr": 350.0,
+      "jobs_direct": null,
+      "status": "commissioned"
+    }
+  },
+  {
+    "id": "gold-4",
+    "text": "Ather Energy announces recruitment drive for 800 battery pack technicians across Hosur manufacturing facility.",
+    "is_relevant": true,
+    "ground_truth": {
+      "company": "Ather Energy",
+      "district_lgd": "582",
+      "cluster_slug": "ev_auto",
+      "investment_inr_cr": null,
+      "jobs_direct": 800,
+      "status": "operational"
+    }
+  },
+  {
+    "id": "gold-5",
+    "text": "ACME Cleantech commences civil works on ₹5,200 crore green hydrogen and ammonia plant in VOC Port industrial zone, Thoothukudi.",
+    "is_relevant": true,
+    "ground_truth": {
+      "company": "ACME Cleantech",
+      "district_lgd": "608",
+      "cluster_slug": "green_hydrogen",
+      "investment_inr_cr": 5200.0,
+      "jobs_direct": null,
+      "status": "groundbreaking"
+    }
+  },
+  {
+    "id": "gold-6",
+    "text": "Stock market indices closed marginally higher on Monday as banking and financial shares witnessed buying interest across Mumbai and Delhi exchanges.",
+    "is_relevant": false,
+    "ground_truth": null
+  },
+  {
+    "id": "gold-7",
+    "text": "Celebrity cricketer visits Chennai mall for commercial endorsement and autograph signing event.",
+    "is_relevant": false,
+    "ground_truth": null
+  },
+  {
+    "id": "gold-8",
+    "text": "Weather forecast predicts moderate to heavy monsoon rainfall across coastal Tamil Nadu districts over the next 48 hours.",
+    "is_relevant": false,
+    "ground_truth": null
+  }
+]
+
